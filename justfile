@@ -96,11 +96,13 @@ build-docs:
 deploy:
     #!pwsh
     git pull origin main --force
-    @test 
-    @security
-    @lint
-    @format
-    @commit
+    python -m unittest discover -s tests 
+    bandit -r src/
+    pylint src/
+    flake8 src/
+    black src/
+    git add .
+    git commit -m Get-Date
     git push -u origin main
 
 # setup logging
