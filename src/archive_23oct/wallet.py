@@ -13,24 +13,23 @@ class Wallet:
 
     def save_to_disk(self):
         wallet_data = {
-            'address': self.address,
-            'balance': self.balance,
-            'public_key': self.public_key.public_bytes(
+            "address": self.address,
+            "balance": self.balance,
+            "public_key": self.public_key.public_bytes(
                 encoding=serialization.Encoding.PEM,
-                format=serialization.PublicFormat.SubjectPublicKeyInfo
-            ).decode('utf-8')
+                format=serialization.PublicFormat.SubjectPublicKeyInfo,
+            ).decode("utf-8"),
         }
-        with open(f'{self.address}.json', 'w') as f:
+        with open(f"{self.address}.json", "w") as f:
             json.dump(wallet_data, f)
 
     @staticmethod
     def load_from_disk(address):
-        if not os.path.exists(f'{address}.json'):
+        if not os.path.exists(f"{address}.json"):
             return None
-        with open(f'{address}.json', 'r') as f:
+        with open(f"{address}.json", "r") as f:
             wallet_data = json.load(f)
         public_key = serialization.load_pem_public_key(
-            wallet_data['public_key'].encode('utf-8'),
-            backend=default_backend()
+            wallet_data["public_key"].encode("utf-8"), backend=default_backend()
         )
-        return Wallet(wallet_data['address'], wallet_data['balance'], public_key)
+        return Wallet(wallet_data["address"], wallet_data["balance"], public_key)

@@ -4,6 +4,7 @@ import time
 import jwt
 import os
 
+
 class Block:
     def __init__(self, index, transactions, previous_token, key):
         self.key = key
@@ -19,7 +20,7 @@ class Block:
         verified_token = self.verify_jwt(previous_token, key)
         if not verified_token:
             return None
-        del verified_token['hash']
+        del verified_token["hash"]
         previous_hash = self.compute_hash(verified_token)
         payload = {
             "index": index,
@@ -37,8 +38,10 @@ class Block:
 
     def proof_of_work(self, payload):
         while True:
-            current_hash = self.compute_hash({k: v for k, v in payload.items() if k != "hash"})
-            if current_hash[:self.difficulty] == "0" * self.difficulty:
+            current_hash = self.compute_hash(
+                {k: v for k, v in payload.items() if k != "hash"}
+            )
+            if current_hash[: self.difficulty] == "0" * self.difficulty:
                 payload["hash"] = current_hash
                 return payload
             payload["nonce"] += 1
@@ -56,9 +59,10 @@ class Block:
             print("Invalid token")
             return None
 
+
 # Example usage
-SECRET_KEY = os.getenv('BLOCK_SECRET_KEY')
-with open("Genesis-Token.txt", 'r') as file:
+SECRET_KEY = os.getenv("BLOCK_SECRET_KEY")
+with open("Genesis-Token.txt", "r") as file:
     genesis_token = file.read()
 
 b1 = Block(1, "A-> B: 2", genesis_token, SECRET_KEY)

@@ -16,20 +16,20 @@ class Transaction:
 
     def get_dict(self):
         return {
-            'sender': self.sender,
-            'recipient': self.recipient,
-            'amount': self.amount,
-            'timestamp': self.timestamp,
-            'signature': self.signature
+            "sender": self.sender,
+            "recipient": self.recipient,
+            "amount": self.amount,
+            "timestamp": self.timestamp,
+            "signature": self.signature,
         }
 
     @staticmethod
     def from_dict(data):
         return Transaction(
-            sender=data['sender'],
-            recipient=data['recipient'],
-            amount=data['amount'],
-            signature=data.get('signature')
+            sender=data["sender"],
+            recipient=data["recipient"],
+            amount=data["amount"],
+            signature=data.get("signature"),
         )
 
     def sign_transaction(self, private_key):
@@ -37,10 +37,9 @@ class Transaction:
         self.signature = private_key.sign(
             message.encode("utf-8"),
             padding.PSS(
-                mgf=padding.MGF1(hashes.SHA256()),
-                salt_length=padding.PSS.MAX_LENGTH
+                mgf=padding.MGF1(hashes.SHA256()), salt_length=padding.PSS.MAX_LENGTH
             ),
-            hashes.SHA256()
+            hashes.SHA256(),
         ).hex()
 
     def verify_transaction(self, sender_wallet, recipient_wallet):
@@ -60,9 +59,9 @@ class Transaction:
                 message.encode("utf-8"),
                 padding.PSS(
                     mgf=padding.MGF1(hashes.SHA256()),
-                    salt_length=padding.PSS.MAX_LENGTH
+                    salt_length=padding.PSS.MAX_LENGTH,
                 ),
-                hashes.SHA256()
+                hashes.SHA256(),
             )
             return True, "Transaction verified."
         except Exception as e:

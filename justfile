@@ -128,7 +128,7 @@ todos:
     #!pwsh
     wic
 
-timeit cmd=start:
+timeit cmd="start":
     #!pwsh
     timetrace {{cmd}} # start, stop, list
 

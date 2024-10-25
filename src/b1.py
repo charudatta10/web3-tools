@@ -7,6 +7,7 @@ from block import Block
 from blockchain import Blockchain
 from nft import NFT
 
+
 class Torrent:
     def __init__(self, torrent_id, data):
         self.torrent_id = torrent_id
@@ -19,11 +20,11 @@ class Torrent:
             "torrent_id": self.torrent_id,
             "data_hash": self.compute_hash(self.data),
             "created_at": time.time(),
-            "peers": self.peers
+            "peers": self.peers,
         }
-        with open(f'torrent_{self.torrent_id}.json', 'w') as f:
+        with open(f"torrent_{self.torrent_id}.json", "w") as f:
             json.dump(torrent_file, f, indent=4)
-        print(f'Torrent file generated: torrent_{self.torrent_id}.json')
+        print(f"Torrent file generated: torrent_{self.torrent_id}.json")
 
     def compute_hash(self, data):
         data_string = json.dumps(data, sort_keys=True)
@@ -32,16 +33,18 @@ class Torrent:
     def add_peer(self, peer_id, peer_info):
         self.peers.append({"peer_id": peer_id, "info": peer_info})
         self.dht[peer_id] = peer_info
-        print(f'Peer {peer_id} added: {peer_info}')
+        print(f"Peer {peer_id} added: {peer_info}")
 
     def get_peers(self):
         return self.peers
 
+
 ### Server and Peer Classes:
 
-#python
+# python
 import socket
 import threading
+
 
 class P2PServer:
     def __init__(self, host, port):
@@ -53,19 +56,19 @@ class P2PServer:
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.bind((self.host, self.port))
         server_socket.listen(5)
-        print(f'Server started at {self.host}:{self.port}')
+        print(f"Server started at {self.host}:{self.port}")
 
         while True:
             client_socket, client_address = server_socket.accept()
-            print(f'Connection from {client_address}')
+            print(f"Connection from {client_address}")
             threading.Thread(target=self.handle_client, args=(client_socket,)).start()
 
     def handle_client(self, client_socket):
         while True:
             try:
-                data = client_socket.recv(1024).decode('utf-8')
+                data = client_socket.recv(1024).decode("utf-8")
                 if data:
-                    print(f'Received: {data}')
+                    print(f"Received: {data}")
                     self.broadcast(data, client_socket)
                 else:
                     break
@@ -77,10 +80,11 @@ class P2PServer:
         for peer in self.peers:
             if peer != client_socket:
                 try:
-                    peer.send(data.encode('utf-8'))
+                    peer.send(data.encode("utf-8"))
                 except:
                     peer.close()
                     self.peers.remove(peer)
+
 
 class Peer:
     def __init__(self, host, port):
@@ -93,14 +97,16 @@ class Peer:
 
         while True:
             data = input("Enter message: ")
-            client_socket.send(data.encode('utf-8'))
+            client_socket.send(data.encode("utf-8"))
 
-            server_response = client_socket.recv(1024).decode('utf-8')
-            print(f'Received from server: {server_response}')
+            server_response = client_socket.recv(1024).decode("utf-8")
+            print(f"Received from server: {server_response}")
+
 
 ### Integration with DAO:
 
-#python
+
+# python
 class DAO(Blockchain):
     def __init__(self, genesis_token, key):
         super().__init__(genesis_token, key)
@@ -118,11 +124,9 @@ class DAO(Blockchain):
 
     def create_proposal(self, proposal_data):
         proposal_id = len(self.proposals)
-        self.proposals.append({
-            "id": proposal_id,
-            "data": proposal_data,
-            "votes": {"yes": 0, "no": 0}
-        })
+        self.proposals.append(
+            {"id": proposal_id, "data": proposal_data, "votes": {"yes": 0, "no": 0}}
+        )
         self.add_block(f"Proposal {proposal_id} created: {proposal_data}")
         print(f"Proposal {proposal_id} created.")
 
@@ -146,7 +150,9 @@ class DAO(Blockchain):
             return
         votes = self.proposals[proposal_id]["votes"]
         result = "passed" if votes["yes"] > votes["no"] else "failed"
-        self.add_block(f"Proposal {proposal_id} {result} with {votes['yes']} yes votes and {votes['no']} no votes")
+        self.add_block(
+            f"Proposal {proposal_id} {result} with {votes['yes']} yes votes and {votes['no']} no votes"
+        )
         if result == "passed":
             self.execute_proposal(proposal_id)
         print(f"Proposal {proposal_id} has {result}")
@@ -176,11 +182,12 @@ class DAO(Blockchain):
     def get_proposals(self):
         return self.proposals
 
+
 ### Example usage with Torrent Class
 
-#python
-SECRET_KEY = os.getenv('BLOCK_SECRET_KEY')
-with open("Genesis-Token.txt", 'r') as file:
+# python
+SECRET_KEY = os.getenv("BLOCK_SECRET_KEY")
+with open("Genesis-Token.txt", "r") as file:
     genesis_token = file.read()
 
 # Create the DAO
@@ -192,7 +199,9 @@ dao.add_member("2", {"name": "Bob"})
 
 # Mint NFTs
 dao.mint_nft("1", {"name": "CryptoKitty", "attributes": {"color": "blue", "age": 2}})
-dao.mint_nft("2", {"name": "CryptoPunk", "attributes": {"style": "punk", "generation": 1}})
+dao.mint_nft(
+    "2", {"name": "CryptoPunk", "attributes": {"style": "punk", "generation": 1}}
+)
 
 # Create a Torrent for NFT sharing
 nft_torrent = Torrent(0, dao.nfts[0].to_dict())

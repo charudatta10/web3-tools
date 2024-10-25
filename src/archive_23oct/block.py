@@ -10,6 +10,7 @@ from cryptography.hazmat.primitives.asymmetric import padding
 from src.wallet import Wallet
 from src.transaction import Transaction
 
+
 class Block:
     def __init__(self, data, prev_data, transactions, *args) -> None:
         private_key, public_key = self._get_keys(*args)
@@ -17,12 +18,14 @@ class Block:
         self.time = str(datetime.now())
         self.height = prev_data.height + 1 if prev_data else 0
         self.difficulty = self.calculate_difficulty()
-        self.version = '1.0'
+        self.version = "1.0"
         self.data = data
         self.transactions = transactions
         self.tx_count = len(transactions)
         self.merkle_root = self.calculate_merkle_root(transactions)
-        self.link = self._get_hash(json.dumps(prev_data.get_dict())) if prev_data else ''
+        self.link = (
+            self._get_hash(json.dumps(prev_data.get_dict())) if prev_data else ""
+        )
         self.author = self._key_conversion(public_key)
         self.nonce = self.proof_of_work(1)
         self.sign = self.get_sign(
@@ -33,15 +36,12 @@ class Block:
     def _get_keys(self, private_key_path, public_key_path):
         with open(private_key_path, "rb") as key_file:
             private_key = serialization.load_pem_private_key(
-                key_file.read(),
-                password=None,
-                backend=default_backend()
+                key_file.read(), password=None, backend=default_backend()
             )
 
         with open(public_key_path, "rb") as key_file:
             public_key = serialization.load_pem_public_key(
-                key_file.read(),
-                backend=default_backend()
+                key_file.read(), backend=default_backend()
             )
         return private_key, public_key
 
@@ -61,8 +61,7 @@ class Block:
         signature = private_key.sign(
             message.encode("utf-8"),
             padding.PSS(
-                mgf=padding.MGF1(hashes.SHA256()),
-                salt_length=padding.PSS.MAX_LENGTH
+                mgf=padding.MGF1(hashes.SHA256()), salt_length=padding.PSS.MAX_LENGTH
             ),
             hashes.SHA256(),
         )
@@ -84,13 +83,15 @@ class Block:
 
     def calculate_merkle_root(self, transactions):
         if not transactions:
-            return ''
-        
+            return ""
+
         def hash_pair(a, b):
             return self._get_hash(a + b)
-        
-        current_level = [self._get_hash(json.dumps(tx.get_dict())) for tx in transactions]
-        
+
+        current_level = [
+            self._get_hash(json.dumps(tx.get_dict())) for tx in transactions
+        ]
+
         while len(current_level) > 1:
             next_level = []
             for i in range(0, len(current_level), 2):
@@ -99,11 +100,13 @@ class Block:
                 else:
                     next_level.append(current_level[i])
             current_level = next_level
-        
+
         return current_level[0]
 
     def add_transaction(self, transaction, sender_wallet, recipient_wallet):
-        verified, message = transaction.verify_transaction(sender_wallet, recipient_wallet)
+        verified, message = transaction.verify_transaction(
+            sender_wallet, recipient_wallet
+        )
         if verified:
             self.transactions.append(transaction)
             self.tx_count = len(self.transactions)
@@ -113,11 +116,12 @@ class Block:
 
     def save_to_disk(self):
         block_data = self.get_dict()
-        with open(f'block_{self.id}.json', 'w') as f:
+        with open(f"block_{self.id}.json", "w") as f:
             json.dump(block_data, f)
 
     def get_dict(self):
         return self.__dict__
+
 
 if __name__ == "__main__":
     private_key_path = "private_key.pem"
@@ -125,15 +129,12 @@ if __name__ == "__main__":
 
     with open(private_key_path, "rb") as key_file:
         private_key = serialization.load_pem_private_key(
-            key_file.read(),
-            password=None,
-            backend=default_backend()
+            key_file.read(), password=None, backend=default_backend()
         )
 
     with open(public_key_path, "rb") as key_file:
         public_key = serialization.load_pem_public_key(
-            key_file.read(),
-            backend=default_backend()
+            key_file.read(), backend=default_backend()
         )
 
     # Example wallets

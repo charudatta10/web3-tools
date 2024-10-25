@@ -2,6 +2,7 @@ import hashlib
 import json
 import time
 
+
 class NFT:
     def __init__(self, nft_id, owner_id, metadata):
         self.nft_id = nft_id
@@ -14,7 +15,7 @@ class NFT:
             "nft_id": self.nft_id,
             "owner_id": self.owner_id,
             "metadata": self.metadata,
-            "timestamp": self.timestamp
+            "timestamp": self.timestamp,
         }
 
     @staticmethod

@@ -7,6 +7,7 @@ from block import Block
 from blockchain import Blockchain
 from nft import NFT
 
+
 class DAO(Blockchain):
     def __init__(self, genesis_token, key):
         super().__init__(genesis_token, key)
@@ -24,11 +25,9 @@ class DAO(Blockchain):
 
     def create_proposal(self, proposal_data):
         proposal_id = len(self.proposals)
-        self.proposals.append({
-            "id": proposal_id,
-            "data": proposal_data,
-            "votes": {"yes": 0, "no": 0}
-        })
+        self.proposals.append(
+            {"id": proposal_id, "data": proposal_data, "votes": {"yes": 0, "no": 0}}
+        )
         self.add_block(f"Proposal {proposal_id} created: {proposal_data}")
         print(f"Proposal {proposal_id} created.")
 
@@ -52,7 +51,9 @@ class DAO(Blockchain):
             return
         votes = self.proposals[proposal_id]["votes"]
         result = "passed" if votes["yes"] > votes["no"] else "failed"
-        self.add_block(f"Proposal {proposal_id} {result} with {votes['yes']} yes votes and {votes['no']} no votes")
+        self.add_block(
+            f"Proposal {proposal_id} {result} with {votes['yes']} yes votes and {votes['no']} no votes"
+        )
         if result == "passed":
             self.execute_proposal(proposal_id)
         print(f"Proposal {proposal_id} has {result}")
@@ -82,9 +83,10 @@ class DAO(Blockchain):
     def get_proposals(self):
         return self.proposals
 
+
 # Example usage
-SECRET_KEY = os.getenv('BLOCK_SECRET_KEY')
-with open("Genesis-Token.txt", 'r') as file:
+SECRET_KEY = os.getenv("BLOCK_SECRET_KEY")
+with open("Genesis-Token.txt", "r") as file:
     genesis_token = file.read()
 
 # Create the DAO
@@ -96,7 +98,9 @@ dao.add_member("2", {"name": "Bob"})
 
 # Mint NFTs
 dao.mint_nft("1", {"name": "CryptoKitty", "attributes": {"color": "blue", "age": 2}})
-dao.mint_nft("2", {"name": "CryptoPunk", "attributes": {"style": "punk", "generation": 1}})
+dao.mint_nft(
+    "2", {"name": "CryptoPunk", "attributes": {"style": "punk", "generation": 1}}
+)
 
 # Calculate Royalties for NFT
 dao.get_nft_royalties(0, 1000, 5)

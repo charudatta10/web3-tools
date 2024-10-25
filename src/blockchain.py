@@ -5,6 +5,7 @@ import jwt
 import os
 from block import Block
 
+
 class Blockchain:
     def __init__(self, genesis_token, key):
         self.chain = []
@@ -40,9 +41,10 @@ class Blockchain:
 
         return True
 
+
 # Example usage
-SECRET_KEY = os.getenv('BLOCK_SECRET_KEY')
-with open("Genesis-Token.txt", 'r') as file:
+SECRET_KEY = os.getenv("BLOCK_SECRET_KEY")
+with open("Genesis-Token.txt", "r") as file:
     genesis_token = file.read()
 
 # Create the blockchain with the genesis block
