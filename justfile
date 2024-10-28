@@ -1,4 +1,4 @@
-#    <one line to give the program's name and a brief idea of what it does.>  
+#    Blockchain, and web3 technology aggregator 
 #    Copyright © 2024 Charudatta
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -18,27 +18,21 @@
 
 set windows-shell := ["pwsh.exe", "-NoLogo", "-Command"]
 
-env_path := "C:/Users/$env:username/Documents/GitHub"
+local__path := "C:/Users/$env:username/Documents/GitHub/"
 
 default:
-    @just --choose
+    @just --list
 
 # create files and directories
 init:
     #!pwsh
-    New-Project.ps1
+    $ProjectName = Read-Host "Enter your project name"
+    Initialize-Project -ProjectName $ProjectName
 
 # add documentation to repo
 docs:
     #!pwsh
-    conda activate blog
-    python -m mkdocs new .
-
-# generate and readme to repo    
-readme:
-    #!pwsh
-    conda activate w
-    python {{env_path}}/readmeGen/main.py
+    mkdocs build
 
 # version control repo with git
 commit message="init":
@@ -50,65 +44,17 @@ commit message="init":
 exe file_name:
     #!pwsh
     pyinstaller src/{{file_name}} --onefile
-
-# run python unit test 
-tests:
-    #!pwsh
-    python -m unittest discover -s tests
-
-# run project
-run:
-    #!pwsh
-    python run.py
-
+ 
 # exit just file
 quit:
     #!pwsh
     write-Host "Copyright © 2024 Charudatta"
     
-# install dependencies
-install:
-    #!pwsh
-    pip install -r requirements.txt
-
-# lint code
-lint:
-    #!pwsh
-    pylint src/
-    flake8 src/
-
-# format code
-format:
-    #!pwsh
-    black src/
-
-# run security checks
-security:
-    #!pwsh
-    bandit -r src/
-
-# build documentation
-build-docs:
-    #!pwsh
-    mkdocs build
-
 # deploy application
 deploy:
     #!pwsh
-    git pull origin main --force
-    python -m unittest discover -s tests 
-    bandit -r src/
-    pylint src/
-    flake8 src/
-    black src/
-    git add .
-    git commit -m Get-Date
-    git push -u origin main
-
-# setup logging
-setup-logging:
-    #!pwsh
-    Add-Logger.ps1
+    $CommitMessage = Read-Host "Enter your commit message"
+    Invoke-DeployChecks -CommitMessage $CommitMessage
 
 # view logs
 view-logs:
@@ -120,24 +66,14 @@ clean:
     #!pwsh
     Remove-Item -Recurse -Force dist, build, *.egg-info
 
-# check for updates
-update:
-    #!pwsh
-    pip list --outdated
-
 # project mangement add task and todos 
-todos:
+tasks:
     #!pwsh
-    wic
-
-timeit cmd="start":
-    #!pwsh
-    timetrace {{cmd}} # start, stop, list
+    python {{local__path}}"project-manager/src/project-manager-cli"
 
 # Add custom tasks, enviroment variables
 
-
-
-
-
-        
+# run project
+# run:
+#    #!pwsh
+#   python run.py
