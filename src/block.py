@@ -2,22 +2,23 @@ import hashlib
 import json
 import time
 import jwt
-import os
-
+import logging
+from cryptography.hazmat.primitives import serialization
 
 class Block:
-    def __init__(self, index, transactions, previous_token, key):
-        self.key = key
+    def __init__(self, index, transactions, previous_token, wallet):
+        self.private_key = wallet.get_private_key_obj()
+        self.public_key = wallet.get_public_key_obj()
         self.difficulty = 1
-        self.payload = self.create_payload(index, 0, transactions, previous_token, key)
+        self.payload = self.create_payload(index, 0, transactions, previous_token, self.public_key)
         self.token = None
 
     def mint_block(self):
         self.payload = self.proof_of_work(self.payload)
-        self.token = self.create_jwt(self.payload, self.key)
+        self.token = self.create_jwt(self.payload, self.private_key)
 
-    def create_payload(self, index, nonce, transactions, previous_token, key):
-        verified_token = self.verify_jwt(previous_token, key)
+    def create_payload(self, index, nonce, transactions, previous_token, public_key):
+        verified_token = self.verify_jwt(previous_token, public_key)
         if not verified_token:
             return None
         del verified_token["hash"]
@@ -27,48 +28,56 @@ class Block:
             "nonce": nonce,
             "transactions": transactions,
             "timestamp": time.time(),
-            "previous_hash": previous_hash,
+            "previous_hash": previous_hash
         }
         payload["hash"] = self.compute_hash(payload)
         return payload
 
-    def compute_hash(self, block):
+    @staticmethod
+    def compute_hash(block):
         block_string = json.dumps(block, sort_keys=True)
         return hashlib.sha256(block_string.encode()).hexdigest()
 
     def proof_of_work(self, payload):
         while True:
-            current_hash = self.compute_hash(
-                {k: v for k, v in payload.items() if k != "hash"}
-            )
-            if current_hash[: self.difficulty] == "0" * self.difficulty:
+            current_hash = self.compute_hash({k: v for k, v in payload.items() if k != "hash"})
+            if current_hash[:self.difficulty] == "0" * self.difficulty:
                 payload["hash"] = current_hash
                 return payload
             payload["nonce"] += 1
 
-    def create_jwt(self, payload, key):
-        return jwt.encode(payload, key, algorithm="HS256")
+    def create_jwt(self, payload, private_key):
+        return jwt.encode(payload, private_key, algorithm="RS256")
 
-    def verify_jwt(self, token, key):
+    def verify_jwt(self, token, public_key):
         try:
-            return jwt.decode(token, key, algorithms=["HS256"])
-        except jwt.ExpiredSignatureError:
-            print("Token has expired")
-            return None
-        except jwt.InvalidTokenError:
-            print("Invalid token")
+            return jwt.decode(token, public_key, algorithms=["RS256"])
+        except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
             return None
 
+    @staticmethod
+    def create_genesis_token(private_key):
+        payload = {
+            "index": 0,
+            "nonce": 0,
+            "transactions": "Genesis Block",
+            "timestamp": time.time(),
+            "previous_hash": "0"
+        }
+        payload["hash"] = Block.compute_hash(payload)
+        token = jwt.encode(payload, private_key, algorithm="RS256")
+        with open("Genesis-Token.txt", "w") as f:
+            f.write(token)
+        return token
 
-# Example usage
-SECRET_KEY = os.getenv("BLOCK_SECRET_KEY")
-with open("Genesis-Token.txt", "r") as file:
-    genesis_token = file.read()
+    @staticmethod
+    def token_to_block(token, wallet):
+        public_key = wallet.get_public_key_obj()
+        decoded = jwt.decode(token, public_key, algorithms=["RS256"])
+        block = Block(decoded['index'], decoded['transactions'], decoded['previous_hash'], wallet)
+        block.payload = decoded
+        block.token = token
+        return block
 
-b1 = Block(1, "A-> B: 2", genesis_token, SECRET_KEY)
-b1.mint_block()
-print(b1.payload)
-
-b2 = Block(2, "B-> A: 2", b1.token, SECRET_KEY)
-b2.mint_block()
-print(b2.payload)
+    def block_to_token(self):
+        return self.token
