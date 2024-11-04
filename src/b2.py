@@ -14,16 +14,18 @@ class Block:
         self.difficulty = 1
 
     def __str__(self):
-        return json.dumps(self.payload)
+        return "None" # json.dumps()
 
-    def mint_block(self, previous_token, public_key):
-        verified_token = self.verify_jwt(previous_token, public_key)
+    def mint_block(self, index, transactions, previous_token, wallet):
+        verified_token = self.verify_jwt(previous_token, wallet.get_public_key_obj())
         if not verified_token:
             return None
         del verified_token["hash"]
         previous_hash = self.compute_hash(verified_token)
-        self.payload = self.proof_of_work(self.payload)
-        self.token = self.create_jwt(self.payload, self.private_key)
+        payload = self.create_payload(index, 0, transactions, previous_hash)
+        payload = self.proof_of_work(payload)
+        token = self.create_jwt(payload, wallet.get_private_key_obj())
+        return token
 
     @staticmethod
     def create_payload(index, nonce, transactions, previous_hash):
@@ -86,34 +88,23 @@ class Block:
             f.write(token)
         return token
 
-    @staticmethod
-    def token_to_block(token, public_key):
-        block_payload = jwt.decode(token, public_key, algorithms=["RS256"])
-        return block_payload
-
+    
 
 class Blockchain:
     def __init__(self, genesis_wallet):
         self.chain = []
-        self.genesis_wallet = genesis_wallet
-        self.wallets = {genesis_wallet.address: genesis_wallet}
-        self.create_genesis_block()
+        self.create_genesis_block(genesis_wallet)
 
-    def create_genesis_block(self):
-        # Serialize the private key to bytes
-        private_key_bytes = self.genesis_wallet.private_key
-        genesis_token = Block.create_genesis_token(private_key_bytes)
-        genesis_block = Block(0, "Genesis Block", genesis_token, self.genesis_wallet)
-        genesis_block.mint_block()
-        self.chain.append(genesis_block.payload)
+    def create_genesis_block(self, genesis_wallet):
+        b1 = Block()
+        genesis_token = Block.create_genesis_token(genesis_wallet.private_key)
+        self.chain.append(genesis_token)
 
     def add_block(self, transactions, wallet):
-        if wallet.address not in self.wallets:
-            raise Exception("Wallet not found")
-        previous_token = Block.create_jwt(self.chain[-1], wallet.private_key)
-        new_block = Block(len(self.chain), transactions, previous_token, wallet)
-        new_block.mint_block()
-        self.chain.append(new_block.payload)
+        # check wallet if exist
+        b1 = Block()
+        m1 = b1.mint_block(len(self.chain), transactions, self.chain[-1], wallet)
+        self.chain.append(m1)
 
     def is_chain_valid(self):
         for i in range(1, len(self.chain)):
@@ -128,22 +119,48 @@ class Blockchain:
         return True
 
     def add_wallet(self, wallet):
-        self.wallets[wallet.address] = wallet
+        pass 
+
+    def __str__(self):
+        temp = " "
+        for block in blockchain.chain:
+            temp + block
+        return temp
+
+def example_block():
+    genesis_wallet = Wallet()
+
+    b1 = Block()
+    genesis_token = Block.create_genesis_token(genesis_wallet.private_key)
+    m1 = b1.mint_block(1, "Second Block", genesis_token, genesis_wallet)
+    print(f"Minted 2nd block:{m1}\n")
+    m2 = b1.mint_block(2, "Third Block", m1, genesis_wallet)
+    print(f"Minted 3nd block:{m2}\n")
+    m3 = b1.mint_block(3, "Fourth Block", m2, genesis_wallet)
+    print(f"Minted 4nd block:{m3}\n")
+
+    print(f" Genesis block payload: {b1.verify_jwt(genesis_token, genesis_wallet.public_key)}\n")
+    print(f" 1st block payload: {b1.verify_jwt(m1, genesis_wallet.public_key)}\n")
+    print(f" 2nd block payload: {b1.verify_jwt(m2, genesis_wallet.public_key)}\n")
+    print(f" 3rd block payload: {b1.verify_jwt(m3, genesis_wallet.public_key)}\n")
 
 # Example usage
-"""
-genesis_wallet = Wallet()
-blockchain = Blockchain(genesis_wallet)
+if __name__ == "__main__":
+    
+    example_block()
+    genesis_wallet = Wallet()
+    blockchain = Blockchain(genesis_wallet)
+    print(str(blockchain))
+    #blockchain.add_wallet(new_wallet)
+    #new_wallet = Wallet()
+    #blockchain.add_wallet(new_wallet)
+    #print(f"0: -> {str(blockchain.chain[0])}")
+    blockchain.add_block("A-> B: 5", genesis_wallet)
+    print(f"1: -> {blockchain.chain[1]}")
+    blockchain.add_block("B-> A: 2", genesis_wallet)
+    print(f"2: -> {blockchain.chain[2]}")
+    #print("Is the blockchain valid?", blockchain.is_chain_valid())
+    print(blockchain.chain)
 
-new_wallet = Wallet()
-blockchain.add_wallet(new_wallet)
-print(f"0: -> {str(blockchain.chain[0])}")
-blockchain.add_block("A-> B: 5", new_wallet)
-print(f"1: -> {str(blockchain.chain[1])}")
-blockchain.add_block("B-> A: 2", new_wallet)
-print(f"2: -> {str(blockchain.chain[2])}")
-print("Is the blockchain valid?", blockchain.is_chain_valid())
-
-for block in blockchain.chain:
-    print(block)
-"""
+    #for block in blockchain.chain:
+    #    print(block)
