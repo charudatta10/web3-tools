@@ -21,7 +21,7 @@ set windows-shell := ["pwsh.exe", "-NoLogo", "-Command"]
 local__path := "C:/Users/$env:username/Documents/GitHub/"
 
 default:
-    @just --list
+    @just --choose
 
 # create files and directories
 init:
