@@ -16,8 +16,12 @@ class CustomCompiler:
                 if isinstance(arg, int):
                     bytecode += f"{arg:02x}"  # Encode integers in hexadecimal
                 elif isinstance(arg, str):
-                    bytecode += ''.join(f"{ord(c):02x}" for c in arg)  # Encode strings as ASCII hex
+                    encoded_string = ''.join(f"{ord(c):02x}" for c in arg)  # Encode strings as ASCII hex
+                    length = f"{len(arg):02x}"  # Encode length in hexadecimal (number of characters)
+                    bytecode += length + encoded_string  # Concatenate length and encoded string
         return bytecode
+
+
 
 # Example usage
 if __name__ == "__main__":

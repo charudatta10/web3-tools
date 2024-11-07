@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>University DAO</title>
+    <script>
+        async function createCourse() {
+            const courseName = document.getElementById('courseName').value;
+            const instructor = document.getElementById('instructor').value;
+            const response = await fetch('/create_course', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ courseName, instructor }),
+            });
+            const result = await response.json();
+            document.getElementById('result').innerText = result.message;
+        }
+
+        async function enrollStudent() {
+            const courseId = document.getElementById('courseId').value;
+            const studentName = document.getElementById('studentName').value;
+            const response = await fetch('/enroll_student', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ courseId, studentName }),
+            });
+            const result = await response.json();
+            document.getElementById('result').innerText = result.message;
+        }
+    </script>
+</head>
+<body>
+    <h1>University DAO</h1>
+    <h2>Create Course</h2>
+    <input type="text" id="courseName" placeholder="Course Name">
+    <input type="text" id="instructor" placeholder="Instructor Name">
+    <button onclick="createCourse()">Create Course</button>
+
+    <h2>Enroll Student</h2>
+    <input type="text" id="courseId" placeholder="Course ID">
+    <input type="text" id="studentName" placeholder="Student Name">
+    <button onclick="enrollStudent()">Enroll Student</button>
+
+    <p id="result"></p>
+</body>
+</html>
