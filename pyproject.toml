@@ -1,8 +1,0 @@
-[tool.pydoc-markdown]
-# Other configuration options...
-pages = [
-    { file = "README.md" },  # Include your main README file
-    { file = "docs/*.md" }   # Include all Markdown files in the 'docs' directory
-]
-
-
