@@ -1,3 +1,5 @@
+.*
+shards/*
 .env
 *.log
 *.ps1
