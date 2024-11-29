@@ -30,6 +30,8 @@ class Block:
         self.payload = payload
         self.token = token
         insert_data(index, token)
+        create_torrent()
+        upload_torrent()
         return token
 
     @staticmethod
