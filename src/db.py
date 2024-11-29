@@ -5,7 +5,7 @@ import os
 NUM_SHARDS = 10
 
 # Directory to store shard databases
-SHARD_DIR = 'shards'
+SHARD_DIR = '.db'
 os.makedirs(SHARD_DIR, exist_ok=True)
 
 # Create shard databases
@@ -37,7 +37,7 @@ def insert_data(key, value):
     conn.close()
 
 # Example: Insert data
-NUM_ENTRIES = 100 #999_000_000_000  # 999 billion entries
+NUM_ENTRIES = 250 #999_000_000_000  # 999 billion entries
 for i in range(NUM_ENTRIES):
     insert_data(i, f'value_{i}')
 
