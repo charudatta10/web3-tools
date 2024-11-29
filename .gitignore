@@ -11,3 +11,4 @@ __*
 docs/html/
 docs/latex/
 src/temp
+.venv

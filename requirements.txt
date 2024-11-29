@@ -1,0 +1,6 @@
+# requirements.txt
+requests==2.22.0
+urllib3<1.26,>=1.21.1
+qbittorrent-api
+six==1.16.0
+
