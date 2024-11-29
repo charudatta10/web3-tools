@@ -4,7 +4,9 @@ import time
 import jwt
 import logging
 from cryptography.hazmat.primitives import serialization
-from wallet import Wallet
+from src.wallet import Wallet
+from src.db import insert_data, query_data
+from src.torrent import create_torrent, download_torrent, upload_torrent
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -27,6 +29,7 @@ class Block:
         token = self.create_jwt(payload, wallet.get_private_key_obj())
         self.payload = payload
         self.token = token
+        insert_data(index, token)
         return token
 
     @staticmethod
@@ -80,3 +83,15 @@ class Block:
         with open("Genesis-Token.txt", "w") as f:
             f.write(token)
         return token
+
+
+if __name__ == "__main__":
+    w1 = Wallet()
+    w1.save_wallet("Genesis-wallet.json")
+    g1 = Block.create_genesis_token(w1.private_key)
+    b1 = Block()
+    for i in range(10):
+        t1 = b1.mint_block(i,"A : 20 -> B", g1, w1)
+        g1 = t1
+        print(t1)
+    

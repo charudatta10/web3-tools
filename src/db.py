@@ -36,13 +36,6 @@ def insert_data(key, value):
     conn.commit()
     conn.close()
 
-# Example: Insert data
-NUM_ENTRIES = 250 #999_000_000_000  # 999 billion entries
-for i in range(NUM_ENTRIES):
-    insert_data(i, f'value_{i}')
-
-print('Data insertion completed.')
-
 
 def query_data(key):
     shard_id = get_shard(key)
@@ -55,7 +48,19 @@ def query_data(key):
     conn.close()
     return result
 
-# Example: Query data
-key_to_query = 59 
-result = query_data(key_to_query)
-print(f'Result for key {key_to_query}: {result}')
+
+
+
+if __name__ == "__main__":
+
+    # Example: Insert data
+    NUM_ENTRIES = 250 #999_000_000_000  # 999 billion entries
+    for i in range(NUM_ENTRIES):
+        insert_data(i, f'value_{i}')
+
+    print('Data insertion completed.')
+
+    # Example: Query data
+    key_to_query = 59 
+    result = query_data(key_to_query)
+    print(f'Result for key {key_to_query}: {result}')
