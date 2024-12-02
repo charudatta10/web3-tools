@@ -6,7 +6,7 @@ import logging
 from cryptography.hazmat.primitives import serialization
 from src.wallet import Wallet
 from src.db import insert_data, query_data
-from src.torrent import create_torrent, download_torrent, upload_torrent
+from src.torrent import create_torrent, download_torrent, seed_torrent
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -30,8 +30,10 @@ class Block:
         self.payload = payload
         self.token = token
         insert_data(index, token)
-        create_torrent()
-        upload_torrent()
+        with open(f"blocks/block_{index}.json", "w" ) as f:
+            f.write(token)
+        create_torrent(f"blocks/block_{index}.json", f"blocks/block_{index}.torrent")
+        seed_torrent(f"blocks/block_{index}.json", f"blocks/block_{index}.torrent")
         return token
 
     @staticmethod

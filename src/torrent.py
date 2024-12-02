@@ -6,23 +6,33 @@ def create_torrent(file_name, torrent_file):
     
 
 def download_torrent(torrent_file, save_path):
-    command = f"webtorrent download {torrent_file}"
+    command = f"webtorrent download {torrent_file} -o {save_path}"
     result = subprocess.run(["powershell.exe", command], capture_output=True, text=True) 
 
 
-def seed_torrent(torrent_file):
-    command = f"webtorrent seed {torrent_file} --keep-seeding"
+def seed_torrent(torrent_file, save_path):
+    command = f"start webtorrent seed {torrent_file} --keep-seeding"
     result = subprocess.run(["powershell.exe", command], capture_output=True, text=True) 
 
 
 
 if __name__ == "__main__":
-    # Create a torrent
-    create_torrent('file_name, torrent_file')
+    
+    file_name = "b.txt"
+    torrent_file = "b.torrent"
+    save_path = "src/"
 
-    # Download a torrent
-    download_torrent(torrent_file, 'path/to/save')
+    # Create a torrent
+    print("Torrent created")
+    create_torrent(file_name, torrent_file)
 
     # Seed a torrent
-    seed_torrent(torrent_file)
+    print("Torrent seeding")
+    seed_torrent(torrent_file, save_path)
+
+    # Download a torrent
+    print("Torrent downloading")
+    download_torrent(torrent_file, save_path)
+
+   
 
