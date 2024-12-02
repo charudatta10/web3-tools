@@ -16,3 +16,4 @@ src/temp
 .venv
 *.json
 *.torrent
+Genesis*
