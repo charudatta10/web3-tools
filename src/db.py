@@ -49,16 +49,17 @@ def query_data(key):
     conn.close()
     return result[0] if result else None
 
-def check_if_data_exists(key):
-    shard_id = get_shard(key)
-    conn = sqlite3.connect(os.path.join(SHARD_DIR, f'shard_{shard_id}.db'))
-    cursor = conn.cursor()
-    cursor.execute('''
-        SELECT 1 FROM data WHERE key = ?
-    ''', (key,))
-    result = cursor.fetchone()
-    conn.close()
+def check_if_data_exists(key): 
+    shard_id = get_shard(key) 
+    conn = sqlite3.connect(os.path.join(SHARD_DIR, f'shard_{shard_id}.db')) 
+    cursor = conn.cursor() 
+    cursor.execute(''' SELECT 1 FROM data WHERE key = ? ''', (key,)) 
+    result = cursor.fetchone() 
+    conn.close() 
     return result is not None
+    
+def check_if_file_exists(file_path): 
+    return os.path.exists(file_path)
 
 def insert_metadata(id, value):
     shard_id = 0  # Use a consistent shard for metadata

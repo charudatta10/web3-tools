@@ -85,7 +85,11 @@ class Block:
         private_key_obj = serialization.load_pem_private_key(private_key_bytes, password=None)
         token = jwt.encode(payload, private_key_obj, algorithm="RS256")
         with open("Genesis-Token.txt", "w") as f:
-            f.write(token)
+            json.dump({"token": token}, f)
+        index = 0
+        insert_data(index, token)
+        create_torrent(f"blocks/block_{index}.json", f"blocks/block_{index}.torrent")
+        seed_torrent(f"blocks/block_{index}.json", f"blocks/block_{index}.torrent")
         return token
 
 

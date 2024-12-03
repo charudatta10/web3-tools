@@ -5,9 +5,10 @@ import jwt
 import logging
 from cryptography.hazmat.primitives import serialization
 from src.wallet import Wallet
-from src.db import insert_data, query_data, check_if_data_exists, query_metadata, insert_metadata
+from src.db import insert_data, query_data, check_if_data_exists, query_metadata, insert_metadata, check_if_file_exists
 from src.torrent import create_torrent, download_torrent, seed_torrent
 from block import Block
+import os
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -47,20 +48,19 @@ class Chain:
             if block:
                 print(json.dumps(block, indent=4))
 
-    def get_block(self, index):
-        block = query_data(index)
-        if block:
-            return json.loads(block)
-
-        torrent_file = f"blocks/block_{index}.torrent"
-        if not check_if_data_exists(torrent_file):
-            download_torrent(torrent_file)
-
-        block_path = f"blocks/block_{index}.json"
-        if os.path.exists(block_path):
-            with open(block_path, "r") as f:
-                return json.load(f)
-        else:
+    def get_block(self, index): 
+        block = query_data(index) 
+        print(block)
+        if block: 
+            return json.dumps(block, indent=4) 
+        torrent_file = f"blocks/block_{index}.torrent" 
+        if not check_if_file_exists(torrent_file): 
+            download_torrent(torrent_file) 
+        block_path = f"blocks/block_{index}.json" 
+        if os.path.exists(block_path): 
+            with open(block_path, "r") as f: 
+                return json.load(f) 
+        else: 
             raise FileNotFoundError(f"Block {index} not found in database or via torrent")
 
     def get_block_count(self):
@@ -89,7 +89,8 @@ class Chain:
 if __name__ == "__main__":
     chain = Chain()
     chain.initialize_chain()
-    previous_token = chain.get_block(0)["token"]
+    previous_token = chain.get_block(0)
+    print(previous_token)
     
     for i in range(1, 10):
         transactions = f"A : 20 -> B {i}"
