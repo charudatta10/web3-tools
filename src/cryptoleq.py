@@ -1,5 +1,6 @@
 import math
 
+
 class Cryptoleq:
     def __init__(self, N):
         self.N = N
@@ -7,7 +8,7 @@ class Cryptoleq:
         self.IP = 0
 
     def O1(self, x, y):
-        N2 = self.N ** 2
+        N2 = self.N**2
         return pow(x, -1, N2) * y % N2
 
     def O2(self, x):
@@ -28,6 +29,7 @@ class Cryptoleq:
                 self.IP = c
             else:
                 self.IP += 3
+
 
 # Example usage
 N = 11  # Example cryptographic parameter

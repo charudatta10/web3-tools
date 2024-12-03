@@ -7,6 +7,7 @@ from block import Block
 from blockchain import Blockchain
 from wallet import Wallet
 
+
 class DAO(Blockchain):
     def __init__(self, genesis_wallet):
         super().__init__(genesis_wallet)

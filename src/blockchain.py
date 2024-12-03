@@ -5,13 +5,22 @@ import jwt
 import logging
 from cryptography.hazmat.primitives import serialization
 from src.wallet import Wallet
-from src.db import insert_data, query_data, check_if_data_exists, query_metadata, insert_metadata, check_if_file_exists
+from src.db import (
+    insert_data,
+    query_data,
+    check_if_data_exists,
+    query_metadata,
+    insert_metadata,
+    check_if_file_exists,
+)
 from src.torrent import create_torrent, download_torrent, seed_torrent
 from block import Block
 import os
-# Setup logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+# Setup logging
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 
 class Chain:
@@ -48,20 +57,22 @@ class Chain:
             if block:
                 print(json.dumps(block, indent=4))
 
-    def get_block(self, index): 
-        block = query_data(index) 
+    def get_block(self, index):
+        block = query_data(index)
         print(block)
-        if block: 
-            return json.dumps(block, indent=4) 
-        torrent_file = f"blocks/block_{index}.torrent" 
-        if not check_if_file_exists(torrent_file): 
-            download_torrent(torrent_file) 
-        block_path = f"blocks/block_{index}.json" 
-        if os.path.exists(block_path): 
-            with open(block_path, "r") as f: 
-                return json.load(f) 
-        else: 
-            raise FileNotFoundError(f"Block {index} not found in database or via torrent")
+        if block:
+            return json.dumps(block, indent=4)
+        torrent_file = f"blocks/block_{index}.torrent"
+        if not check_if_file_exists(torrent_file):
+            download_torrent(torrent_file)
+        block_path = f"blocks/block_{index}.json"
+        if os.path.exists(block_path):
+            with open(block_path, "r") as f:
+                return json.load(f)
+        else:
+            raise FileNotFoundError(
+                f"Block {index} not found in database or via torrent"
+            )
 
     def get_block_count(self):
         count = query_metadata("block_count")
@@ -86,12 +97,13 @@ class Chain:
                 results.append(block)
         return results
 
+
 if __name__ == "__main__":
     chain = Chain()
     chain.initialize_chain()
     previous_token = chain.get_block(0)
     print(previous_token)
-    
+
     for i in range(1, 10):
         transactions = f"A : 20 -> B {i}"
         new_token = chain.add_block(i, transactions, previous_token)
@@ -101,12 +113,18 @@ if __name__ == "__main__":
             print(f"Block {i} minting failed")
 
     chain.display_chain()
-    
+
     block_by_index = chain.query_block_by_index(3)
     print(f"Block with index 3: {json.dumps(block_by_index, indent=4)}")
 
     blocks_by_transaction = chain.query_block_by_transaction("A : 20 -> B 5")
-    print(f"Blocks with transaction 'A : 20 -> B 5': {[json.dumps(block, indent=4) for block in blocks_by_transaction]}")
+    print(
+        f"Blocks with transaction 'A : 20 -> B 5': {[json.dumps(block, indent=4) for block in blocks_by_transaction]}"
+    )
 
-    blocks_by_timestamp = chain.query_block_by_timestamp(time.time() - 10000, time.time())
-    print(f"Blocks within timestamp range: {[json.dumps(block, indent=4) for block in blocks_by_timestamp]}")
+    blocks_by_timestamp = chain.query_block_by_timestamp(
+        time.time() - 10000, time.time()
+    )
+    print(
+        f"Blocks within timestamp range: {[json.dumps(block, indent=4) for block in blocks_by_timestamp]}"
+    )
