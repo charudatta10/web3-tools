@@ -6,10 +6,18 @@ class Cryptoleq:
         self.N = N
         self.memory = []
         self.IP = 0
+        self.students = []
+        self.courses = []
+        self.registrations = []
 
     def O1(self, x, y):
-        N2 = self.N**2
-        return pow(x, -1, N2) * y % N2
+        N2 = self.N ** 2
+        try:
+            inv_x = pow(x, -1, N2)
+        except ValueError:
+            # Handle non-invertible case
+            inv_x = 1  # or another appropriate value or handling mechanism
+        return (inv_x * y) % N2
 
     def O2(self, x):
         return math.floor((x - 1) / self.N)
@@ -19,6 +27,8 @@ class Cryptoleq:
 
     def execute(self):
         while self.IP < len(self.memory):
+            if self.IP + 2 >= len(self.memory):
+                break
             a = self.memory[self.IP]
             b = self.memory[self.IP + 1]
             c = self.memory[self.IP + 2]
