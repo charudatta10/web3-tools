@@ -1,103 +1,97 @@
-class Parser:
-    def __init__(self, tokens):
-        self.tokens = tokens
-        self.current_token = 0
+from sly import Parser
 
-    def parse(self):
-        return self.program()
+class MyParser(Parser):
+    tokens = MyLexer.tokens
 
-    def program(self):
-        statements = []
-        while self.current_token < len(self.tokens) - 1:
-            stmt = self.statement()
-            if stmt is not None:
-                statements.append(stmt)
-        return statements
+    def __init__(self):
+        self.names = {}
 
-    def statement(self):
-        token = self.tokens[self.current_token]
-        if token[0] == 'LET':
-            return self.assignment()
-        elif token[0] == 'IF':
-            return self.if_statement()
-        elif token[0] == 'WHILE':
-            return self.while_statement()
-        elif token[0] == 'ADD':
-            return self.add_statement()
-        elif token[0] == 'SUB':
-            return self.sub_statement()
-        elif token[0] == 'MUL':
-            return self.mul_statement()
-        elif token[0] == 'DIV':
-            return self.div_statement()
-        elif token[0] == 'COMMENT':
-            self.current_token += 1
-            return None
+    @_('LET IDENTIFIER ASSIGN NUMBER')
+    def statement(self, p):
+        return ('let', p.IDENTIFIER, p.NUMBER)
+
+    @_('IF condition statement')
+    def statement(self, p):
+        return ('if', p.condition, p.statement)
+
+    @_('LOOP condition statement')
+    def statement(self, p):
+        return ('loop', p.condition, p.statement)
+
+    @_('CALL IDENTIFIER statement')
+    def statement(self, p):
+        return ('function_def', p.IDENTIFIER, p.statement)
+
+    @_('IDENTIFIER')
+    def statement(self, p):
+        return ('function_call', p.IDENTIFIER)
+
+    @_('IO IDENTIFIER STRING')
+    def statement(self, p):
+        return ('io', p.IDENTIFIER, p.STRING)
+
+    @_('TRY statement')
+    def statement(self, p):
+        return ('try', p.statement)
+
+    @_('MEM IDENTIFIER')
+    def statement(self, p):
+        return ('mem', p.IDENTIFIER)
+
+    @_('THREAD statement')
+    def statement(self, p):
+        return ('thread', p.statement)
+
+    @_('GET IDENTIFIER')
+    def statement(self, p):
+        return ('get', p.IDENTIFIER)
+
+    @_('SET IDENTIFIER NUMBER')
+    def statement(self, p):
+        return ('set', p.IDENTIFIER, p.NUMBER)
+
+    @_('MAT IDENTIFIER')
+    def statement(self, p):
+        return ('mat', p.IDENTIFIER)
+
+    @_('LPAREN IDENTIFIER COMPARE NUMBER RPAREN')
+    def condition(self, p):
+        return ('condition', p.IDENTIFIER, p.COMPARE, p.NUMBER)
+
+    @_('condition LOGICAL condition')
+    def condition(self, p):
+        return ('logical', p.condition0, p.LOGICAL, p.condition1)
+
+    def error(self, p):
+        if p:
+            print(f'Syntax error at token {p.type!r}')
+            self.errok()
         else:
-            raise RuntimeError(f'Unexpected token: {token[1]}')
+            print('Syntax error at EOF')
 
-    def assignment(self):
-        self.consume('LET')
-        var_name = self.consume('ID')
-        self.consume('EQ')
-        expr = self.expression()
-        return ('let', var_name[1], expr)
+# Example usage
+parser = MyParser()
+code = '''
+LET x = 10
+IF (x > 5) && (x < 20)
+    CALL myFunction
+MAT tableName
+CALL IO read "input.txt"
+TRY
+    CALL riskyFunction
+MEM load x
+THREAD
+    CALL parallelFunction
+GET key
+SET key 42
+myFunction
+    LET y = 20
+    IO write "output.txt"
+'''
+lexer = MyLexer()
+tokens = lexer.tokenize(code)
+for token in tokens:
+    print(token)
 
-    def if_statement(self):
-        self.consume('IF')
-        condition = self.expression()
-        body = self.program()
-        return ('if', condition, body)
-
-    def while_statement(self):
-        self.consume('WHILE')
-        condition = self.expression()
-        body = self.program()
-        return ('while', condition, body)
-
-    def add_statement(self):
-        self.consume('ADD')
-        left = self.expression()
-        self.consume('ADD')
-        right = self.expression()
-        return ('add', left, right)
-
-    def sub_statement(self):
-        self.consume('SUB')
-        left = self.expression()
-        self.consume('SUB')
-        right = self.expression()
-        return ('sub', left, right)
-
-    def mul_statement(self):
-        self.consume('MUL')
-        left = self.expression()
-        self.consume('MUL')
-        right = self.expression()
-        return ('multiply', left, right)
-
-    def div_statement(self):
-        self.consume('DIV')
-        left = self.expression()
-        self.consume('DIV')
-        right = self.expression()
-        return ('divide', left, right)
-
-    def expression(self):
-        token = self.tokens[self.current_token]
-        if token[0] == 'NUMBER':
-            self.current_token += 1
-            return ('number', token[1])
-        elif token[0] == 'ID':
-            self.current_token += 1
-            return ('var', token[1])
-        else:
-            raise RuntimeError(f'Unexpected token: {token[1]}')
-
-    def consume(self, token_type):
-        token = self.tokens[self.current_token]
-        if token[0] == token_type:
-            self.current_token += 1
-            return token
-        else:
-            raise RuntimeError(f'Expected {token_type}, but got {token[1]}')
+ast = parser.parse(tokens)
+print(ast)
