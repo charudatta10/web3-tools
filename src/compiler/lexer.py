@@ -1,64 +1,59 @@
-import re
-from collections import namedtuple
+from sly import Lexer
 
-# Define the token structure
-Token = namedtuple('Token', ['type', 'value', 'position'])
+class MyLexer(Lexer):
+    tokens = { NUMBER, STRING, IDENTIFIER, ASSIGN, OPERATOR, COMPARE, LOGICAL, LPAREN, RPAREN, IF, LET, LOOP, CALL, IO, TRY, MEM, THREAD, GET, SET, MAT }
+    ignore = ' \t'
 
-# Define token types and patterns
-TOKEN_SPECIFICATION = [
-    ('NUMBER', r'\d+'),
-    ('STRING', r'"[^"]*"'),
-    ('IDENTIFIER', r'[a-zA-Z_]\w*'),
-    ('ASSIGN', r'='),
-    ('OPERATOR', r'[+\-*/]'),
-    ('COMPARE', r'[<>]=?|==|!='),
-    ('LOGICAL', r'&&|\|\|'),
-    ('LPAREN', r'\('),
-    ('RPAREN', r'\)'),
-    ('IF', r'IF'),
-    ('LET', r'LET'),
-    ('LOOP', r'LOOP'),
-    ('CALL', r'CALL'),
-    ('IO', r'IO'),
-    ('TRY', r'TRY'),
-    ('MEM', r'MEM'),
-    ('THREAD', r'THREAD'),
-    ('GET', r'GET'),
-    ('SET', r'SET'),
-    ('MAT', r'MAT'),  # New keyword for table data structure
-    ('SKIP', r'[ \t]+'),  # Skip whitespace
-    ('MISMATCH', r'.'),  # Catch any other character
-]
+    # Token patterns
+    NUMBER = r'\d+'
+    STRING = r'"[^"]*"'
+    IDENTIFIER = r'[a-zA-Z_]\w*'
+    ASSIGN = r'='
+    OPERATOR = r'[+\-*/]'
+    COMPARE = r'[<>]=?|==|!='
+    LOGICAL = r'&&|\|\|'
+    LPAREN = r'\('
+    RPAREN = r'\)'
 
-# Compile the regex patterns
-token_regex = '|'.join(f'(?P<{pair[0]}>{pair[1]})' for pair in TOKEN_SPECIFICATION)
-get_token = re.compile(token_regex).match
+    # Keywords
+    IF = r'IF'
+    LET = r'LET'
+    LOOP = r'LOOP'
+    CALL = r'CALL'
+    IO = r'IO'
+    TRY = r'TRY'
+    MEM = r'MEM'
+    THREAD = r'THREAD'
+    GET = r'GET'
+    SET = r'SET'
+    MAT = r'MAT'
 
-class Lexer:
-    def __init__(self, code):
-        self.code = code
-        self.line = 1
-        self.position = 0
+    @_(r'\n+')
+    def newline(self, t):
+        self.lineno += len(t.value)
 
-    def tokenize(self):
-        tokens = []
-        mo = get_token(self.code)
-        while mo is not None:
-            typ = mo.lastgroup
-            if typ == 'SKIP':
-                pass
-            elif typ == 'MISMATCH':
-                raise RuntimeError(f'Unexpected character: {mo.group()} at line {self.line}')
-            else:
-                value = mo.group(typ)
-                tokens.append(Token(typ, value, self.position))
-            self.position = mo.end()
-            mo = get_token(self.code, self.position)
-        return tokens
+    def error(self, t):
+        print(f'Illegal character {t.value[0]!r}')
+        self.index += 1
 
 # Example usage
-code = 'LET x = 10 IF (x > 5) && (x < 20) MAT table CALL IO'
-lexer = Lexer(code)
-tokens = lexer.tokenize()
-for token in tokens:
+lexer = MyLexer()
+code = '''
+LET x = 10
+IF (x > 5) && (x < 20)
+    CALL myFunction
+MAT tableName
+CALL IO read "input.txt"
+TRY
+    CALL riskyFunction
+MEM load x
+THREAD
+    CALL parallelFunction
+GET key
+SET key 42
+myFunction
+    LET y = 20
+    IO write "output.txt"
+'''
+for token in lexer.tokenize(code):
     print(token)
