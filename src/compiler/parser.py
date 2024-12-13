@@ -70,29 +70,32 @@ class MyParser(Parser):
         else:
             print('Syntax error at EOF')
 
-# Example usage
-parser = MyParser()
-code = '''
-LET x = 10
-IF (x > 5) && (x < 20)
-    CALL myFunction
-MAT tableName
-CALL IO read "input.txt"
-TRY
-    CALL riskyFunction
-MEM load x
-THREAD
-    CALL parallelFunction
-GET key
-SET key 42
-myFunction
-    LET y = 20
-    IO write "output.txt"
-'''
-lexer = MyLexer()
-tokens = lexer.tokenize(code)
-for token in tokens:
-    print(token)
 
-ast = parser.parse(tokens)
-print(ast)
+
+# Example usage
+if __name__ == "__main__":
+    parser = MyParser()
+    code = '''
+    LET x = 10
+    IF (x > 5) && (x < 20)
+        CALL myFunction
+    MAT tableName
+    CALL IO read "input.txt"
+    TRY
+        CALL riskyFunction
+    MEM load x
+    THREAD
+        CALL parallelFunction
+    GET key
+    SET key 42
+    myFunction
+        LET y = 20
+        IO write "output.txt"
+    '''
+    lexer = MyLexer()
+    tokens = lexer.tokenize(code)
+    for token in tokens:
+        print(token)
+
+    ast = parser.parse(tokens)
+    print(ast)
