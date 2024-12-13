@@ -4,24 +4,21 @@ from lexer import MyLexer
 class MyParser(Parser):
     tokens = MyLexer.tokens
 
-    def __init__(self):
-        self.names = {}
-
     @_('LET IDENTIFIER ASSIGN NUMBER')
     def statement(self, p):
         return ('let', p.IDENTIFIER, p.NUMBER)
 
-    @_('IF condition statement_list')
+    @_('IF condition statement_block')
     def statement(self, p):
-        return ('if', p.condition, p.statement_list)
+        return ('if', p.condition, p.statement_block)
 
-    @_('LOOP condition statement_list')
+    @_('LOOP condition statement_block')
     def statement(self, p):
-        return ('loop', p.condition, p.statement_list)
+        return ('loop', p.condition, p.statement_block)
 
-    @_('CALL IDENTIFIER statement_list')
+    @_('CALL IDENTIFIER statement_block')
     def statement(self, p):
-        return ('function_def', p.IDENTIFIER, p.statement_list)
+        return ('function_def', p.IDENTIFIER, p.statement_block)
 
     @_('IDENTIFIER')
     def statement(self, p):
@@ -31,17 +28,17 @@ class MyParser(Parser):
     def statement(self, p):
         return ('io', p.IDENTIFIER, p.STRING)
 
-    @_('TRY statement_list')
+    @_('TRY statement_block')
     def statement(self, p):
-        return ('try', p.statement_list)
+        return ('try', p.statement_block)
 
     @_('MEM IDENTIFIER')
     def statement(self, p):
         return ('mem', p.IDENTIFIER)
 
-    @_('THREAD statement_list')
+    @_('THREAD statement_block')
     def statement(self, p):
-        return ('thread', p.statement_list)
+        return ('thread', p.statement_block)
 
     @_('GET IDENTIFIER')
     def statement(self, p):
@@ -63,17 +60,13 @@ class MyParser(Parser):
     def condition(self, p):
         return ('logical', p.condition0, p.LOGICAL, p.condition1)
 
-    @_('statement_list statement')
-    def statement_list(self, p):
-        return ('statement_list', p.statement_list, p.statement)
+    @_('statement statement_block')
+    def statement_block(self, p):
+        return ('statement_block', p.statement, p.statement_block)
 
     @_('statement')
-    def statement_list(self, p):
-        return p.statement
-
-    @_('')
-    def empty(self, p):
-        return ('empty',)
+    def statement_block(self, p):
+        return ('statement_block', p.statement)
 
     def error(self, p):
         if p:
