@@ -6,15 +6,6 @@ Token = namedtuple('Token', ['type', 'value', 'position'])
 
 # Define token types and patterns
 TOKEN_SPECIFICATION = [
-    ('NUMBER', r'\d+'),
-    ('STRING', r'"[^"]*"'),
-    ('IDENTIFIER', r'[a-zA-Z_]\w*'),
-    ('ASSIGN', r'='),
-    ('OPERATOR', r'[+\-*/]'),
-    ('COMPARE', r'[<>]=?|==|!='),
-    ('LOGICAL', r'&&|\|\|'),
-    ('LPAREN', r'\('),
-    ('RPAREN', r'\)'),
     ('IF', r'IF'),
     ('LET', r'LET'),
     ('LOOP', r'LOOP'),
@@ -26,6 +17,15 @@ TOKEN_SPECIFICATION = [
     ('GET', r'GET'),
     ('SET', r'SET'),
     ('MAT', r'MAT'),  # New keyword for table data structure
+    ('NUMBER', r'\d+'),
+    ('STRING', r'"[^"]*"'),
+    ('IDENTIFIER', r'[a-zA-Z_]\w*'),
+    ('ASSIGN', r'='),
+    ('OPERATOR', r'[+\-*/]'),
+    ('COMPARE', r'[<>]=?|==|!='),
+    ('LOGICAL', r'&&|\|\|'),
+    ('LPAREN', r'\('),
+    ('RPAREN', r'\)'),
     ('SKIP', r'[ \t]+'),  # Skip whitespace
     ('NEWLINE', r'\n'),   # Line endings
     ('MISMATCH', r'.'),  # Catch any other character
@@ -191,7 +191,19 @@ class Parser:
         op = self.expect('COMPARE')
         right = self.expect('NUMBER')
         self.expect('RPAREN')
-        return ASTNode('CONDITION', value=[left, op, right])
+        condition = ASTNode('CONDITION', value=[left, op, right])
+        
+        # Check for logical operator after condition
+        if self.pos < len(self.tokens) and self.tokens[self.pos].type == 'LOGICAL':
+            logical_op = self.tokens[self.pos]
+            self.pos += 1
+            next_condition = self.parse_condition()
+            logical_node = ASTNode('LOGICAL', value=logical_op.value)
+            logical_node.children.append(condition)
+            logical_node.children.append(next_condition)
+            return logical_node
+
+        return condition
 
     def expect(self, expected_type):
         token = self.tokens[self.pos]
@@ -205,6 +217,7 @@ class Parser:
 parser = Parser(tokens)
 ast = parser.parse()
 print(ast)
+
 
 def generate_code(ast):
     code = []
