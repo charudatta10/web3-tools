@@ -11,6 +11,10 @@ TOKEN_SPECIFICATION = [
     ('IDENTIFIER', r'[a-zA-Z_]\w*'),
     ('ASSIGN', r'='),
     ('OPERATOR', r'[+\-*/]'),
+    ('COMPARE', r'[<>]=?|==|!='),
+    ('LOGICAL', r'&&|\|\|'),
+    ('LPAREN', r'\('),
+    ('RPAREN', r'\)'),
     ('IF', r'IF'),
     ('LET', r'LET'),
     ('LOOP', r'LOOP'),
@@ -52,9 +56,8 @@ class Lexer:
         return tokens
 
 # Example usage
-code = 'LET x = 10 IF x > 5 CALL IO'
+code = 'LET x = 10 IF (x > 5) && (x < 20) CALL IO'
 lexer = Lexer(code)
 tokens = lexer.tokenize()
 for token in tokens:
     print(token)
-
