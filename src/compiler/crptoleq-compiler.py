@@ -58,11 +58,22 @@ class Lexer:
             mo = get_token(self.code, self.position)
         return tokens
 
-# Example usage
-code = 'LET x = 10 IF (x > 5) && (x < 20) MAT table CALL IO'
-lexer = Lexer(code)
-tokens = lexer.tokenize()
-for token in tokens:
+# Example usage 
+code = ''' 
+LET x = 10 
+IF (x > 5) && (x < 20) 
+    CALL myFunction 
+MAT tableName 
+CALL IO 
+TRY CALL riskyFunction 
+MEM load x 
+THREAD CALL parallelFunction 
+GET key 
+SET key 42
+''' 
+lexer = Lexer(code) 
+tokens = lexer.tokenize() 
+for token in tokens: 
     print(token)
 
 class ASTNode:
