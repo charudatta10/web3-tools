@@ -1,4 +1,5 @@
 from sly import Parser
+from lexer import MyLexer
 
 class MyParser(Parser):
     tokens = MyLexer.tokens
@@ -89,6 +90,9 @@ if __name__ == "__main__":
         LET y = 20
         IO write "output.txt"
     '''
-    tokens = lexer.tokenize(code)
+    tokens = list(lexer.tokenize(code))
+    for token in tokens:
+        print(token)
+
     ast = parser.parse(tokens)
     print(ast)

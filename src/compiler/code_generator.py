@@ -4,6 +4,7 @@ class CodeGenerator:
         self.label_count = 0
 
     def generate(self, node):
+        print("Generating code for node:", node)  # Debugging line
         method_name = 'gen_' + node[0]
         method = getattr(self, method_name, self.gen_default)
         return method(node)
@@ -95,7 +96,32 @@ class CodeGenerator:
         return label
 
 if __name__ == "__main__":
-    # Generate code
+    lexer = MyLexer()
+    parser = MyParser()
+    code = '''
+    LET x = 10
+    IF (x > 5) && (x < 20)
+        CALL myFunction
+    MAT tableName
+    CALL IO read "input.txt"
+    TRY
+        CALL riskyFunction
+    MEM load x
+    THREAD
+        CALL parallelFunction
+    GET key
+    SET key 42
+    myFunction
+        LET y = 20
+        IO write "output.txt"
+    '''
+    tokens = list(lexer.tokenize(code))
+    for token in tokens:
+        print(token)
+
+    ast = parser.parse(tokens)
+    print(ast)
+
     code_generator = CodeGenerator()
     generated_code = code_generator.generate(('program', ast))
     print('\n'.join(generated_code))
