@@ -1,48 +1,60 @@
 import re
+from collections import namedtuple
+
+# Define the token structure
+Token = namedtuple('Token', ['type', 'value', 'position'])
+
+# Define token types and patterns
+TOKEN_SPECIFICATION = [
+    ('NUMBER', r'\d+'),
+    ('STRING', r'"[^"]*"'),
+    ('IDENTIFIER', r'[a-zA-Z_]\w*'),
+    ('ASSIGN', r'='),
+    ('OPERATOR', r'[+\-*/]'),
+    ('IF', r'IF'),
+    ('LET', r'LET'),
+    ('LOOP', r'LOOP'),
+    ('CALL', r'CALL'),
+    ('IO', r'IO'),
+    ('TRY', r'TRY'),
+    ('MEM', r'MEM'),
+    ('THREAD', r'THREAD'),
+    ('GET', r'GET'),
+    ('SET', r'SET'),
+    ('SKIP', r'[ \t]+'),  # Skip whitespace
+    ('MISMATCH', r'.'),  # Catch any other character
+]
+
+# Compile the regex patterns
+token_regex = '|'.join(f'(?P<{pair[0]}>{pair[1]})' for pair in TOKEN_SPECIFICATION)
+get_token = re.compile(token_regex).match
 
 class Lexer:
-    def __init__(self, source_code):
-        self.source_code = source_code
-        self.tokens = []
-        self.current_token = 0
+    def __init__(self, code):
+        self.code = code
+        self.line = 1
+        self.position = 0
 
     def tokenize(self):
-        token_specification = [
-            ('NUMBER',    r'\d+'),            # Integer
-            ('ID',        r'[A-Za-z_]\w*'),   # Identifiers
-            ('OP',        r'[+*-/]'),         # Arithmetic operators
-            ('LET',       r'let'),            # Variable assignment
-            ('IF',        r'if'),             # If keyword
-            ('WHILE',     r'while'),          # While keyword
-            ('ADD',       r'add'),            # Add keyword
-            ('SUB',       r'sub'),            # Subtract keyword
-            ('MUL',       r'multiply'),       # Multiply keyword
-            ('DIV',       r'divide'),         # Divide keyword
-            ('LPAREN',    r'\('),             # Left Parenthesis
-            ('RPAREN',    r'\)'),             # Right Parenthesis
-            ('EQ',        r'='),              # Assignment operator
-            ('COMMENT',   r'#.*'),            # Comment
-            ('SKIP',      r'[ \t\n]+'),       # Skip spaces and newlines
-            ('MISMATCH',  r'.'),              # Any other character
-        ]
-        tok_regex = '|'.join(f'(?P<{pair[0]}>{pair[1]})' for pair in token_specification)
-        get_token = re.compile(tok_regex).match
-        line_num = 1
-        line_start = 0
-        mo = get_token(self.source_code)
+        tokens = []
+        mo = get_token(self.code)
         while mo is not None:
-            kind = mo.lastgroup
-            value = mo.group(kind)
-            if kind == 'NUMBER':
-                value = int(value)
-            elif kind == 'ID':
-                value = value
-            elif kind == 'COMMENT' or kind == 'SKIP':
-                mo = get_token(self.source_code, mo.end())
-                continue
-            elif kind == 'MISMATCH':
-                raise RuntimeError(f'{value!r} unexpected on line {line_num}')
-            self.tokens.append((kind, value))
-            mo = get_token(self.source_code, mo.end())
-        self.tokens.append(('EOF', 'EOF'))
-        return self.tokens
+            typ = mo.lastgroup
+            if typ == 'SKIP':
+                pass
+            elif typ == 'MISMATCH':
+                raise RuntimeError(f'Unexpected character: {mo.group()} at line {self.line}')
+            else:
+                value = mo.group(typ)
+                tokens.append(Token(typ, value, self.position))
+            self.position = mo.end()
+            mo = get_token(self.code, self.position)
+        return tokens
+
+# Example usage
+code = 'LET x = 10 IF x > 5 CALL IO'
+lexer = Lexer(code)
+tokens = lexer.tokenize()
+for token in tokens:
+    print(token)
+
