@@ -1,90 +1,105 @@
 class CodeGenerator:
     def __init__(self):
-        self.variables = {}
-        self.memory = []
-        self.IP = 0
+        self.code = []
+        self.label_count = 0
 
-    def generate(self, ast):
-        for node in ast:
-            self.visit(node)
-        return self.memory
+    def generate(self, node):
+        method_name = 'gen_' + node.type.lower()
+        method = getattr(self, method_name, self.gen_default)
+        return method(node)
 
-    def visit(self, node):
-        method_name = 'visit_' + node[0]
-        visitor = getattr(self, method_name)
-        return visitor(node)
+    def gen_default(self, node):
+        raise Exception(f'No generate method for {node.type}')
 
-    def visit_let(self, node):
-        _, var, expr = node
-        value = self.evaluate_expression(expr)
-        if var not in self.variables:
-            self.variables[var] = self.IP
-            self.IP += 1
-        self.memory.append(self.variables[var])
-        self.memory.append(value)
-        self.memory.append(self.IP + 3)
-        self.IP += 3
+    def gen_program(self, node):
+        for child in node.children:
+            self.generate(child)
+        return self.code
 
-    def visit_if(self, node):
-        _, condition, body = node
-        condition_value = self.evaluate_expression(condition)
-        self.memory.append(condition_value)
-        self.memory.append(self.IP + 6)
-        self.memory.append(self.IP + 3)
-        self.IP += 6
-        for stmt in body:
-            self.visit(stmt)
+    def gen_let(self, node):
+        identifier, value = node.value
+        self.code.append(f'LET {identifier.value} = {value.value}')
 
-    def visit_while(self, node):
-        _, condition, body = node
-        condition_value = self.evaluate_expression(condition)
-        start_ip = self.IP
-        self.memory.append(condition_value)
-        self.memory.append(self.IP + 9)
-        self.memory.append(self.IP + 3)
-        self.IP += 9
-        for stmt in body:
-            self.visit(stmt)
-        self.memory.append(start_ip)
+    def gen_if(self, node):
+        condition, body = node.children
+        self.generate(condition)
+        label = self.new_label()
+        self.code.append(f'JMP_IF_FALSE {label}')
+        self.generate(body)
+        self.code.append(f'{label}:')
 
-    def visit_add(self, node):
-        _, left, right = node
-        left_value = self.evaluate_expression(left)
-        right_value = self.evaluate_expression(right)
-        self.memory.append(left_value + right_value)
-        self.memory.append(self.IP + 3)
-        self.memory.append(self.IP + 3)
-        self.IP += 3
+    def gen_loop(self, node):
+        condition, body = node.children
+        start_label = self.new_label()
+        end_label = self.new_label()
+        self.code.append(f'{start_label}:')
+        self.generate(condition)
+        self.code.append(f'JMP_IF_FALSE {end_label}')
+        self.generate(body)
+        self.code.append(f'JMP {start_label}')
+        self.code.append(f'{end_label}:')
 
-    def visit_sub(self, node):
-        _, left, right = node
-        left_value = self.evaluate_expression(left)
-        right_value = self.evaluate_expression(right)
-        self.memory.append(left_value - right_value)
-        self.memory.append(self.IP + 3)
-        self.memory.append(self.IP + 3)
-        self.IP += 3
+    def gen_function_def(self, node):
+        func_name = node.value
+        body = node.children[0]
+        self.code.append(f'FUNCTION {func_name}')
+        self.generate(body)
+        self.code.append(f'END FUNCTION')
 
-    def visit_multiply(self, node):
-        _, left, right = node
-        left_value = self.evaluate_expression(left)
-        right_value = self.evaluate_expression(right)
-        self.memory.append(left_value * right_value)
-        self.memory.append(self.IP + 3)
-        self.memory.append(self.IP + 3)
-        self.IP += 3
+    def gen_function_call(self, node):
+        func_name = node.value
+        self.code.append(f'CALL {func_name}')
 
-    def visit_divide(self, node):
-        _, left, right = node
-        left_value = self.evaluate_expression(left)
-        right_value = self.evaluate_expression(right)
-        self.memory.append(left_value // right_value)
-        self.memory.append(self.IP + 3)
-        self.memory.append(self.IP + 3)
-        self.IP += 3
+    def gen_io(self, node):
+        operation, filename = node.value
+        self.code.append(f'IO {operation} {filename}')
 
-    def evaluate_expression(self, expr):
-        if expr[0] == 'number':
-            return expr[1]
-        elif expr[0] == 'var':
-            return self.variables
+    def gen_try(self, node):
+        body = node.children[0]
+        self.code.append('TRY')
+        self.generate(body)
+        self.code.append('END TRY')
+
+    def gen_mem(self, node):
+        op = node.value
+        self.code.append(f'MEM {op}')
+
+    def gen_thread(self, node):
+        body = node.children[0]
+        self.code.append('THREAD')
+        self.generate(body)
+        self.code.append('END THREAD')
+
+    def gen_get(self, node):
+        key = node.value
+        self.code.append(f'GET {key}')
+
+    def gen_set(self, node):
+        key, value = node.value
+        self.code.append(f'SET {key} {value.value}')
+
+    def gen_mat(self, node):
+        table_name = node.value
+        self.code.append(f'MAT {table_name}')
+
+    def gen_condition(self, node):
+        left, op, right = node.value
+        self.code.append(f'IF {left.value} {op.value} {right.value}')
+
+    def gen_logical(self, node):
+        left_condition = node.children[0]
+        logical_op = node.value
+        right_condition = node.children[1]
+        self.generate(left_condition)
+        self.code.append(f'{logical_op}')
+        self.generate(right_condition)
+
+    def new_label(self):
+        label = f'L{self.label_count}'
+        self.label_count += 1
+        return label
+
+# Example usage
+code_generator = CodeGenerator()
+generated_code = code_generator.generate(ast)
+print('\n'.join(generated_code))
