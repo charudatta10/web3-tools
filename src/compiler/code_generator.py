@@ -4,6 +4,8 @@ class CodeGenerator:
         self.label_count = 0
 
     def generate(self, node):
+        if node is None:
+            raise Exception('AST node is None. Check parsing process.')
         print("Generating code for node:", node)  # Debugging line
         method_name = 'gen_' + node[0]
         method = getattr(self, method_name, self.gen_default)
@@ -90,6 +92,10 @@ class CodeGenerator:
         self.code.append(f'{logical_op}')
         self.generate(right_condition)
 
+    def gen_statement_list(self, node):
+        self.generate(node[1])
+        self.generate(node[2])
+
     def new_label(self):
         label = f'L{self.label_count}'
         self.label_count += 1
@@ -115,13 +121,11 @@ if __name__ == "__main__":
         LET y = 20
         IO write "output.txt"
     '''
-    tokens = list(lexer.tokenize(code))
-    for token in tokens:
-        print(token)
-
+    tokens = lexer.tokenize(code)
+    tokens = iter(tokens)  # Convert list of tokens to an iterator
     ast = parser.parse(tokens)
     print(ast)
 
     code_generator = CodeGenerator()
-    generated_code = code_generator.generate(('program', ast))
+    generated_code = code_generator.generate(ast)
     print('\n'.join(generated_code))

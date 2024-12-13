@@ -63,9 +63,9 @@ class MyParser(Parser):
     def condition(self, p):
         return ('logical', p.condition0, p.LOGICAL, p.condition1)
 
-    @_('statement statement')
+    @_('statement_list statement')
     def statement_list(self, p):
-        return ('statement_list', p.statement0, p.statement1)
+        return ('statement_list', p.statement_list, p.statement)
 
     @_('statement')
     def statement_list(self, p):
@@ -98,9 +98,7 @@ if __name__ == "__main__":
         LET y = 20
         IO write "output.txt"
     '''
-    tokens = list(lexer.tokenize(code))
-    for token in tokens:
-        print(token)
-
+    tokens = lexer.tokenize(code)
+    tokens = iter(tokens)  # Convert list of tokens to an iterator
     ast = parser.parse(tokens)
     print(ast)
