@@ -1,4 +1,5 @@
 from sly import Parser
+from lexer import  MyLexer
 
 class MyParser(Parser):
     tokens = MyLexer.tokens
