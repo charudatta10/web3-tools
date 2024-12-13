@@ -42,9 +42,10 @@ class Cryptoleq:
 
 
 # Example usage
-N = 11  # Example cryptographic parameter
-program = [12, 15, 6, 20, 25, 8, 13, 18, 9]  # Example program
-cryptoleq = Cryptoleq(N)
-cryptoleq.load_program(program)
-cryptoleq.execute()
-print(cryptoleq.memory)
+if __name__ == "__main__":
+    N = 11  # Example cryptographic parameter
+    program = [12, 15, 6, 20, 25, 8, 13, 18, 9]  # Example program
+    cryptoleq = Cryptoleq(N)
+    cryptoleq.load_program(program)
+    cryptoleq.execute()
+    print(cryptoleq.memory)

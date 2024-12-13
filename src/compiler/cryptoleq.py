@@ -47,7 +47,8 @@ class Cryptoleq:
         return 0  # Example placeholder value
 
 # Example usage
-cryptoleq = Cryptoleq(11)
-cryptoleq.load_program_from_code(generated_code)
-cryptoleq.execute()
-print(cryptoleq.memory)
+if __name__ == "__main__":
+    cryptoleq = Cryptoleq(11)
+    cryptoleq.load_program_from_code(generated_code)
+    cryptoleq.execute()
+    print(cryptoleq.memory)
