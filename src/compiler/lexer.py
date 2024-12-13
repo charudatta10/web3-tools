@@ -1,7 +1,7 @@
 from sly import Lexer
 
 class MyLexer(Lexer):
-    tokens = { NUMBER, STRING, IDENTIFIER, ASSIGN, OPERATOR, COMPARE, LOGICAL, LPAREN, RPAREN, IF, LET, LOOP, CALL, IO, TRY, MEM, THREAD, GET, SET, MAT }
+    tokens = { NUMBER, STRING, IDENTIFIER, ASSIGN, COMPARE, LOGICAL, LPAREN, RPAREN, IF, LET, LOOP, CALL, IO, TRY, MEM, THREAD, GET, SET, MAT }
     ignore = ' \t'
 
     # Token patterns
@@ -9,7 +9,6 @@ class MyLexer(Lexer):
     STRING = r'"[^"]*"'
     IDENTIFIER = r'[a-zA-Z_]\w*'
     ASSIGN = r'='
-    OPERATOR = r'[+\-*/]'
     COMPARE = r'[<>]=?|==|!='
     LOGICAL = r'&&|\|\|'
     LPAREN = r'\('

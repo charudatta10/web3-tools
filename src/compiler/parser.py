@@ -63,6 +63,14 @@ class MyParser(Parser):
     def condition(self, p):
         return ('logical', p.condition0, p.LOGICAL, p.condition1)
 
+    @_('statement statement')
+    def statement_list(self, p):
+        return ('statement_list', p.statement0, p.statement1)
+
+    @_('statement')
+    def statement_list(self, p):
+        return p.statement
+
     def error(self, p):
         if p:
             print(f'Syntax error at token {p.type!r}')
