@@ -11,17 +11,17 @@ class MyParser(Parser):
     def statement(self, p):
         return ('let', p.IDENTIFIER, p.NUMBER)
 
-    @_('IF condition statement')
+    @_('IF condition statement_list')
     def statement(self, p):
-        return ('if', p.condition, p.statement)
+        return ('if', p.condition, p.statement_list)
 
-    @_('LOOP condition statement')
+    @_('LOOP condition statement_list')
     def statement(self, p):
-        return ('loop', p.condition, p.statement)
+        return ('loop', p.condition, p.statement_list)
 
-    @_('CALL IDENTIFIER statement')
+    @_('CALL IDENTIFIER statement_list')
     def statement(self, p):
-        return ('function_def', p.IDENTIFIER, p.statement)
+        return ('function_def', p.IDENTIFIER, p.statement_list)
 
     @_('IDENTIFIER')
     def statement(self, p):
@@ -31,17 +31,17 @@ class MyParser(Parser):
     def statement(self, p):
         return ('io', p.IDENTIFIER, p.STRING)
 
-    @_('TRY statement')
+    @_('TRY statement_list')
     def statement(self, p):
-        return ('try', p.statement)
+        return ('try', p.statement_list)
 
     @_('MEM IDENTIFIER')
     def statement(self, p):
         return ('mem', p.IDENTIFIER)
 
-    @_('THREAD statement')
+    @_('THREAD statement_list')
     def statement(self, p):
-        return ('thread', p.statement)
+        return ('thread', p.statement_list)
 
     @_('GET IDENTIFIER')
     def statement(self, p):
@@ -70,6 +70,10 @@ class MyParser(Parser):
     @_('statement')
     def statement_list(self, p):
         return p.statement
+
+    @_('')
+    def empty(self, p):
+        return ('empty',)
 
     def error(self, p):
         if p:
