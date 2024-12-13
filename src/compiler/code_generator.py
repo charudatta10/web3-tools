@@ -100,6 +100,7 @@ class CodeGenerator:
         return label
 
 # Example usage
-code_generator = CodeGenerator()
-generated_code = code_generator.generate(ast)
-print('\n'.join(generated_code))
+if __name__ == "__main__":
+    code_generator = CodeGenerator()
+    generated_code = code_generator.generate(ast)
+    print('\n'.join(generated_code))
