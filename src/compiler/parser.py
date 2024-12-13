@@ -4,6 +4,18 @@ from lexer import MyLexer
 class MyParser(Parser):
     tokens = MyLexer.tokens
 
+    @_('statement_list')
+    def program(self, p):
+        return p.statement_list
+
+    @_('statement statement_list')
+    def statement_list(self, p):
+        return ('statement_list', p.statement, p.statement_list)
+
+    @_('statement')
+    def statement_list(self, p):
+        return ('statement_block', p.statement)
+
     @_('LET IDENTIFIER ASSIGN NUMBER')
     def statement(self, p):
         return ('let', p.IDENTIFIER, p.NUMBER)
@@ -59,14 +71,6 @@ class MyParser(Parser):
     @_('condition LOGICAL condition')
     def condition(self, p):
         return ('logical', p.condition0, p.LOGICAL, p.condition1)
-
-    @_('statement statement_block')
-    def statement_block(self, p):
-        return ('statement_block', p.statement, p.statement_block)
-
-    @_('statement')
-    def statement_block(self, p):
-        return ('statement_block', p.statement)
 
     def error(self, p):
         if p:

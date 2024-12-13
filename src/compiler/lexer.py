@@ -15,61 +15,12 @@ class MyLexer(Lexer):
     RPAREN = r'\)'
 
     # Keywords
-    tokens.update({'IF', 'LET', 'LOOP', 'DEF', 'IO', 'TRY', 'MEM', 'THREAD', 'GET', 'SET', 'MAT'})
+    keywords = { 'IF', 'LET', 'LOOP', 'DEF', 'IO', 'TRY', 'MEM', 'THREAD', 'GET', 'SET', 'MAT' }
 
-    @_(r'IF')
-    def IF(self, t):
-        t.type = 'IF'
-        return t
-
-    @_(r'LET')
-    def LET(self, t):
-        t.type = 'LET'
-        return t
-
-    @_(r'LOOP')
-    def LOOP(self, t):
-        t.type = 'LOOP'
-        return t
-
-    @_(r'DEF')
-    def DEF(self, t):
-        t.type = 'DEF'
-        return t
-
-    @_(r'IO')
-    def IO(self, t):
-        t.type = 'IO'
-        return t
-
-    @_(r'TRY')
-    def TRY(self, t):
-        t.type = 'TRY'
-        return t
-
-    @_(r'MEM')
-    def MEM(self, t):
-        t.type = 'MEM'
-        return t
-
-    @_(r'THREAD')
-    def THREAD(self, t):
-        t.type = 'THREAD'
-        return t
-
-    @_(r'GET')
-    def GET(self, t):
-        t.type = 'GET'
-        return t
-
-    @_(r'SET')
-    def SET(self, t):
-        t.type = 'SET'
-        return t
-
-    @_(r'MAT')
-    def MAT(self, t):
-        t.type = 'MAT'
+    @_(r'[a-zA-Z_]\w*')
+    def IDENTIFIER(self, t):
+        if t.value.upper() in self.keywords:
+            t.type = t.value.upper()
         return t
 
     @_(r'\n+')
