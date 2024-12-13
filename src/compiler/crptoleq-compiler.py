@@ -106,7 +106,9 @@ class Parser:
         elif token.type == 'LOOP':
             return self.parse_loop()
         elif token.type == 'CALL':
-            return self.parse_call()
+            return self.parse_function_definition()
+        elif token.type == 'IDENTIFIER':
+            return self.parse_function_call()
         elif token.type == 'IO':
             return self.parse_io()
         elif token.type == 'TRY':
@@ -147,16 +149,23 @@ class Parser:
         node.children.append(body)
         return node
 
-    def parse_call(self):
+    def parse_function_definition(self):
         self.expect('CALL')
         func_name = self.expect('IDENTIFIER')
-        node = ASTNode('CALL', func_name.value)
+        body = self.parse_expression()
+        node = ASTNode('FUNCTION_DEF', value=func_name.value)
+        node.children.append(body)
         return node
+
+    def parse_function_call(self):
+        func_name = self.expect('IDENTIFIER')
+        return ASTNode('FUNCTION_CALL', value=func_name.value)
 
     def parse_io(self):
         self.expect('IO')
-        op = self.expect('IDENTIFIER')
-        node = ASTNode('IO', op.value)
+        operation = self.expect('IDENTIFIER')
+        filename = self.expect('STRING')
+        node = ASTNode('IO', value=[operation.value, filename.value])
         return node
 
     def parse_try(self):
@@ -225,9 +234,32 @@ class Parser:
             raise SyntaxError(f'Expected token type {expected_type}, got {token.type}')
 
 # Example usage
+code = '''
+LET x = 10
+IF (x > 5) && (x < 20)
+    CALL myFunction
+MAT tableName
+CALL IO read "input.txt"
+TRY
+    CALL riskyFunction
+MEM load x
+THREAD
+    CALL parallelFunction
+GET key
+SET key 42
+myFunction
+    LET y = 20
+    IO write "output.txt"
+'''
+lexer = Lexer(code)
+tokens = lexer.tokenize()
+for token in tokens:
+    print(token)
+
 parser = Parser(tokens)
 ast = parser.parse()
 print(ast)
+
 
 
 def generate_code(ast):
