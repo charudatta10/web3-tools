@@ -25,6 +25,7 @@ TOKEN_SPECIFICATION = [
     ('THREAD', r'THREAD'),
     ('GET', r'GET'),
     ('SET', r'SET'),
+    ('MAT', r'MAT'),  # New keyword for table data structure
     ('SKIP', r'[ \t]+'),  # Skip whitespace
     ('MISMATCH', r'.'),  # Catch any other character
 ]
@@ -56,7 +57,7 @@ class Lexer:
         return tokens
 
 # Example usage
-code = 'LET x = 10 IF (x > 5) && (x < 20) CALL IO'
+code = 'LET x = 10 IF (x > 5) && (x < 20) MAT table CALL IO'
 lexer = Lexer(code)
 tokens = lexer.tokenize()
 for token in tokens:
