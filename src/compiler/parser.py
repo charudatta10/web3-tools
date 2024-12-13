@@ -91,6 +91,7 @@ if __name__ == "__main__":
         CALL parallelFunction
     GET key
     SET key 42
+
     myFunction
         LET y = 20
         IO write "output.txt"
@@ -99,3 +100,4 @@ if __name__ == "__main__":
     tokens = iter(tokens)  # Convert list of tokens to an iterator
     ast = parser.parse(tokens)
     print(ast)
+
