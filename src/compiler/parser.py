@@ -1,5 +1,4 @@
 from sly import Parser
-from lexer import  MyLexer
 
 class MyParser(Parser):
     tokens = MyLexer.tokens
@@ -70,10 +69,8 @@ class MyParser(Parser):
         else:
             print('Syntax error at EOF')
 
-
-
-# Example usage
 if __name__ == "__main__":
+    lexer = MyLexer()
     parser = MyParser()
     code = '''
     LET x = 10
@@ -92,10 +89,6 @@ if __name__ == "__main__":
         LET y = 20
         IO write "output.txt"
     '''
-    lexer = MyLexer()
     tokens = lexer.tokenize(code)
-    for token in tokens:
-        print(token)
-
     ast = parser.parse(tokens)
     print(ast)

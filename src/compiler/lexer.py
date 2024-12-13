@@ -36,7 +36,6 @@ class MyLexer(Lexer):
         print(f'Illegal character {t.value[0]!r}')
         self.index += 1
 
-# Example usage
 if __name__ == "__main__":
     lexer = MyLexer()
     code = '''

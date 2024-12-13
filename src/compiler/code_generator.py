@@ -4,24 +4,19 @@ class CodeGenerator:
         self.label_count = 0
 
     def generate(self, node):
-        method_name = 'gen_' + node.type.lower()
+        method_name = 'gen_' + node[0]
         method = getattr(self, method_name, self.gen_default)
         return method(node)
 
     def gen_default(self, node):
-        raise Exception(f'No generate method for {node.type}')
-
-    def gen_program(self, node):
-        for child in node.children:
-            self.generate(child)
-        return self.code
+        raise Exception(f'No generate method for {node[0]}')
 
     def gen_let(self, node):
-        identifier, value = node.value
-        self.code.append(f'LET {identifier.value} = {value.value}')
+        identifier, value = node[1], node[2]
+        self.code.append(f'LET {identifier} = {value}')
 
     def gen_if(self, node):
-        condition, body = node.children
+        condition, body = node[1], node[2]
         self.generate(condition)
         label = self.new_label()
         self.code.append(f'JMP_IF_FALSE {label}')
@@ -29,7 +24,7 @@ class CodeGenerator:
         self.code.append(f'{label}:')
 
     def gen_loop(self, node):
-        condition, body = node.children
+        condition, body = node[1], node[2]
         start_label = self.new_label()
         end_label = self.new_label()
         self.code.append(f'{start_label}:')
@@ -40,56 +35,56 @@ class CodeGenerator:
         self.code.append(f'{end_label}:')
 
     def gen_function_def(self, node):
-        func_name = node.value
-        body = node.children[0]
+        func_name = node[1]
+        body = node[2]
         self.code.append(f'FUNCTION {func_name}')
         self.generate(body)
         self.code.append(f'END FUNCTION')
 
     def gen_function_call(self, node):
-        func_name = node.value
+        func_name = node[1]
         self.code.append(f'CALL {func_name}')
 
     def gen_io(self, node):
-        operation, filename = node.value
+        operation, filename = node[1], node[2]
         self.code.append(f'IO {operation} {filename}')
 
     def gen_try(self, node):
-        body = node.children[0]
+        body = node[1]
         self.code.append('TRY')
         self.generate(body)
         self.code.append('END TRY')
 
     def gen_mem(self, node):
-        op = node.value
+        op = node[1]
         self.code.append(f'MEM {op}')
 
     def gen_thread(self, node):
-        body = node.children[0]
+        body = node[1]
         self.code.append('THREAD')
         self.generate(body)
         self.code.append('END THREAD')
 
     def gen_get(self, node):
-        key = node.value
+        key = node[1]
         self.code.append(f'GET {key}')
 
     def gen_set(self, node):
-        key, value = node.value
-        self.code.append(f'SET {key} {value.value}')
+        key, value = node[1], node[2]
+        self.code.append(f'SET {key} {value}')
 
     def gen_mat(self, node):
-        table_name = node.value
+        table_name = node[1]
         self.code.append(f'MAT {table_name}')
 
     def gen_condition(self, node):
-        left, op, right = node.value
-        self.code.append(f'IF {left.value} {op.value} {right.value}')
+        left, op, right = node[1], node[2], node[3]
+        self.code.append(f'IF {left} {op} {right}')
 
     def gen_logical(self, node):
-        left_condition = node.children[0]
-        logical_op = node.value
-        right_condition = node.children[1]
+        left_condition = node[1]
+        logical_op = node[2]
+        right_condition = node[3]
         self.generate(left_condition)
         self.code.append(f'{logical_op}')
         self.generate(right_condition)
@@ -99,8 +94,8 @@ class CodeGenerator:
         self.label_count += 1
         return label
 
-# Example usage
 if __name__ == "__main__":
+    # Generate code
     code_generator = CodeGenerator()
-    generated_code = code_generator.generate(ast)
+    generated_code = code_generator.generate(('program', ast))
     print('\n'.join(generated_code))

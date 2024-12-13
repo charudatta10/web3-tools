@@ -29,26 +29,4 @@ class Cryptoleq:
             b = self.memory[self.IP + 1]
             c = self.memory[self.IP + 2]
 
-            self.memory[self.IP + 1] = self.O1(a, b)
-
-            if self.O2(self.memory[self.IP + 1]) <= 0:
-                self.IP = c
-            else:
-                self.IP += 3
-
-    def load_program_from_code(self, code):
-        # Convert the generated code into memory instructions
-        # This part needs to be implemented based on your instruction format
-        self.memory = [self.convert_instruction(instr) for instr in code]
-
-    def convert_instruction(self, instr):
-        # Convert human-readable instructions to numeric values
-        # Placeholder implementation, needs to be replaced with actual logic
-        return 0  # Example placeholder value
-
-# Example usage
-if __name__ == "__main__":
-    cryptoleq = Cryptoleq(11)
-    cryptoleq.load_program_from_code(generated_code)
-    cryptoleq.execute()
-    print(cryptoleq.memory)
+            self.memory
