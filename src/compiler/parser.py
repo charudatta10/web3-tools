@@ -97,6 +97,8 @@ if __name__ == "__main__":
         IO write "output.txt"
     '''
     tokens = lexer.tokenize(code)
+    for token in tokens:
+        print(token)
     tokens = iter(tokens)  # Convert list of tokens to an iterator
     ast = parser.parse(tokens)
     print(ast)
