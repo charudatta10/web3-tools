@@ -1,5 +1,5 @@
-from sly import Parser
 from lexer import MyLexer
+from sly import Parser
 
 class MyParser(Parser):
     tokens = MyLexer.tokens
@@ -72,9 +72,13 @@ class MyParser(Parser):
     def condition(self, p):
         return ('logical', p.condition0, p.LOGICAL, p.condition1)
 
+    @_('statement_list')
+    def statement_block(self, p):
+        return p.statement_list
+
     def error(self, p):
         if p:
-            print(f'Syntax error at token {p.type!r}')
+            print(f'Syntax error at token {p.type!r} at line {p.lineno} index {p.index}')
             self.errok()
         else:
             print('Syntax error at EOF')
