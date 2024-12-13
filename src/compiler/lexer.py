@@ -1,7 +1,7 @@
 from sly import Lexer
 
 class MyLexer(Lexer):
-    tokens = { NUMBER, STRING, IDENTIFIER, ASSIGN, COMPARE, LOGICAL, LPAREN, RPAREN, IF, LET, LOOP, CALL, IO, TRY, MEM, THREAD, GET, SET, MAT }
+    tokens = { NUMBER, STRING, IDENTIFIER, ASSIGN, COMPARE, LOGICAL, LPAREN, RPAREN, IF, LET, LOOP, DEF, IO, TRY, MEM, THREAD, GET, SET, MAT }
     ignore = ' \t'
 
     # Token patterns
@@ -15,17 +15,62 @@ class MyLexer(Lexer):
     RPAREN = r'\)'
 
     # Keywords
-    IF = r'IF'
-    LET = r'LET'
-    LOOP = r'LOOP'
-    CALL = r'CALL'
-    IO = r'IO'
-    TRY = r'TRY'
-    MEM = r'MEM'
-    THREAD = r'THREAD'
-    GET = r'GET'
-    SET = r'SET'
-    MAT = r'MAT'
+    tokens.update({'IF', 'LET', 'LOOP', 'DEF', 'IO', 'TRY', 'MEM', 'THREAD', 'GET', 'SET', 'MAT'})
+
+    @_(r'IF')
+    def IF(self, t):
+        t.type = 'IF'
+        return t
+
+    @_(r'LET')
+    def LET(self, t):
+        t.type = 'LET'
+        return t
+
+    @_(r'LOOP')
+    def LOOP(self, t):
+        t.type = 'LOOP'
+        return t
+
+    @_(r'DEF')
+    def DEF(self, t):
+        t.type = 'DEF'
+        return t
+
+    @_(r'IO')
+    def IO(self, t):
+        t.type = 'IO'
+        return t
+
+    @_(r'TRY')
+    def TRY(self, t):
+        t.type = 'TRY'
+        return t
+
+    @_(r'MEM')
+    def MEM(self, t):
+        t.type = 'MEM'
+        return t
+
+    @_(r'THREAD')
+    def THREAD(self, t):
+        t.type = 'THREAD'
+        return t
+
+    @_(r'GET')
+    def GET(self, t):
+        t.type = 'GET'
+        return t
+
+    @_(r'SET')
+    def SET(self, t):
+        t.type = 'SET'
+        return t
+
+    @_(r'MAT')
+    def MAT(self, t):
+        t.type = 'MAT'
+        return t
 
     @_(r'\n+')
     def newline(self, t):
@@ -40,16 +85,17 @@ if __name__ == "__main__":
     code = '''
     LET x = 10
     IF (x > 5) && (x < 20)
-        CALL myFunction
+        DEF myFunction
     MAT tableName
-    CALL IO read "input.txt"
+    DEF IO read "input.txt"
     TRY
-        CALL riskyFunction
+        DEF riskyFunction
     MEM load x
     THREAD
-        CALL parallelFunction
+        DEF parallelFunction
     GET key
     SET key 42
+
     myFunction
         LET y = 20
         IO write "output.txt"

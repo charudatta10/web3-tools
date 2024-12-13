@@ -16,7 +16,7 @@ class MyParser(Parser):
     def statement(self, p):
         return ('loop', p.condition, p.statement_block)
 
-    @_('CALL IDENTIFIER statement_block')
+    @_('DEF IDENTIFIER statement_block')
     def statement(self, p):
         return ('function_def', p.IDENTIFIER, p.statement_block)
 
@@ -81,14 +81,14 @@ if __name__ == "__main__":
     code = '''
     LET x = 10
     IF (x > 5) && (x < 20)
-        CALL myFunction
+        DEF myFunction
     MAT tableName
-    CALL IO read "input.txt"
+    DEF IO read "input.txt"
     TRY
-        CALL riskyFunction
+        DEF riskyFunction
     MEM load x
     THREAD
-        CALL parallelFunction
+        DEF parallelFunction
     GET key
     SET key 42
 
@@ -97,9 +97,6 @@ if __name__ == "__main__":
         IO write "output.txt"
     '''
     tokens = lexer.tokenize(code)
-    for token in tokens:
-        print(token)
     tokens = iter(tokens)  # Convert list of tokens to an iterator
     ast = parser.parse(tokens)
     print(ast)
-
