@@ -37,23 +37,24 @@ class MyLexer(Lexer):
         self.index += 1
 
 # Example usage
-lexer = MyLexer()
-code = '''
-LET x = 10
-IF (x > 5) && (x < 20)
-    CALL myFunction
-MAT tableName
-CALL IO read "input.txt"
-TRY
-    CALL riskyFunction
-MEM load x
-THREAD
-    CALL parallelFunction
-GET key
-SET key 42
-myFunction
-    LET y = 20
-    IO write "output.txt"
-'''
-for token in lexer.tokenize(code):
-    print(token)
+if __name__ == "__main__":
+    lexer = MyLexer()
+    code = '''
+    LET x = 10
+    IF (x > 5) && (x < 20)
+        CALL myFunction
+    MAT tableName
+    CALL IO read "input.txt"
+    TRY
+        CALL riskyFunction
+    MEM load x
+    THREAD
+        CALL parallelFunction
+    GET key
+    SET key 42
+    myFunction
+        LET y = 20
+        IO write "output.txt"
+    '''
+    for token in lexer.tokenize(code):
+        print(token)
