@@ -164,7 +164,7 @@ initial_memory = [
     0, 1, 2,  # ADD R1, R2
     1, 1, 2,  # SUB R1, R2
     2, 1, 2,  # MUL R1, R2
-    3, 1, 2,  # DIV R1, R2
+    2, 1, 2,  # DIV R1, R2
     11, 4,    # JMP to address 4
     10, 1, 3, # MOVE R1 to R3
 ]
