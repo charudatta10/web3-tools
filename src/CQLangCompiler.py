@@ -1,4 +1,4 @@
-from src.cryptoleq import Cryptoleq
+from cryptoleq import Cryptoleq
 
 class CQLangCompiler:
     def __init__(self):
