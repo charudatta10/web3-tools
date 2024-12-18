@@ -4,6 +4,28 @@ class CustomVM:
         self.pc = 0  # Program counter
         self.registers = [0] * 10  # 10 general-purpose registers
         self.stack = []
+        self.instructions = {
+            0: self.add,
+            1: self.sub,
+            2: self.mul,
+            3: self.div,
+            4: self.and_op,
+            5: self.or_op,
+            6: self.xor_op,
+            7: self.not_op,
+            8: self.load,
+            9: self.store,
+            10: self.move,
+            11: self.jmp,
+            12: self.jz,
+            13: self.jnz,
+            14: self.call,
+            15: self.ret,
+            16: self.hash_op,
+            17: self.sign,
+            18: self.verify,
+            19: self.block_info,
+        }
 
     def fetch_instruction(self):
         op_code = self.memory[self.pc]
@@ -113,63 +135,38 @@ class CustomVM:
         self.pc = self.stack.pop()
 
     def hash_op(self):
-        # Example: Simple hash using a sum of ASCII values
         a = self.memory[self.pc]
         self.registers[a] = sum(map(ord, str(self.registers[a])))
         self.pc += 1
 
     def sign(self):
-        # Example: Simplified signing (could be extended for actual cryptography)
         a = self.memory[self.pc]
-        private_key = "private_key"  # Placeholder
+        private_key = "private_key"
         self.registers[a] = hash(self.registers[a] + hash(private_key))
         self.pc += 1
 
     def verify(self):
-        # Example: Simplified verification
         a = self.memory[self.pc]
-        public_key = "public_key"  # Placeholder
+        public_key = "public_key"
         self.registers[a] = (self.registers[a] == hash(self.registers[a] + hash(public_key)))
         self.pc += 1
 
     def block_info(self):
-        # Placeholder for block information retrieval
-        self.registers[0] = 123456  # Example block number
+        self.registers[0] = 123456
         self.pc += 1
 
-    # Mapping opcodes to functions
-    instructions = {
-        0: add,
-        1: sub,
-        2: mul,
-        3: div,
-        4: and_op,
-        5: or_op,
-        6: xor_op,
-        7: not_op,
-        8: load,
-        9: store,
-        10: move,
-        11: jmp,
-        12: jz,
-        13: jnz,
-        14: call,
-        15: ret,
-        16: hash_op,
-        17: sign,
-        18: verify,
-        19: block_info,
-    }
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 # Initialize the VM with some memory
 initial_memory = [
-    0, 1, 2, 0,  # ADD R1, R2
-    1, 1, 2, 0,  # SUB R1, R2
-    2, 1, 2, 0,  # MUL R1, R2
-    3, 1, 2, 0,  # DIV R1, R2
-    11, 4,  # JMP to address 4
-    10, 1, 3,  # MOVE R1 to R3
+    0, 1, 2,  # ADD R1, R2
+    1, 1, 2,  # SUB R1, R2
+    2, 1, 2,  # MUL R1, R2
+    3, 1, 2,  # DIV R1, R2
+    11, 4,    # JMP to address 4
+    10, 1, 3, # MOVE R1 to R3
 ]
 
 # Create the VM instance
