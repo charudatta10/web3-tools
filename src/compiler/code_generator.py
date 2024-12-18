@@ -1,3 +1,6 @@
+from lexer import MyLexer
+from parser import MyParser
+
 class CodeGenerator:
     def __init__(self):
         self.code = []
