@@ -78,6 +78,8 @@ class CustomVM:
         self.pc += 2
 
     def div(self):
+        if self.pc + 1 >= len(self.memory):
+            raise IndexError("Memory access out of bounds")
         a = self.memory[self.pc]
         b = self.memory[self.pc + 1]
         self.validate_register_index(a)
