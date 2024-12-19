@@ -1,3 +1,5 @@
+import logging
+
 class CustomVM:
     def __init__(self, memory):
         self.memory = memory  # Initial memory setup
@@ -77,8 +79,9 @@ class CustomVM:
         self.validate_register_index(a)
         self.validate_register_index(b)
         if self.registers[b] == 0:
-            raise ZeroDivisionError(f"Division by zero error: register[{b}] is zero.")
-        self.registers[a] //= self.registers[b]
+            logging.error(f"Division by zero error: register[{b}] is zero. Skipping operation.")
+        else:
+            self.registers[a] //= self.registers[b]
         self.pc += 2
 
     def and_op(self):
@@ -182,25 +185,3 @@ class CustomVM:
     def block_info(self):
         self.registers[0] = 123456
         self.pc += 1
-
-
-import logging
-logging.basicConfig(level=logging.DEBUG)
-
-# Initialize the VM with some memory
-initial_memory = [
-    0, 1, 2,  # ADD R1, R2
-    1, 1, 2,  # SUB R1, R2
-    2, 1, 2,  # MUL R1, R2
-    3, 1, 2,  # DIV R1, R2 (ensure R2 is not zero)
-    11, 4,    # JMP to address 4
-    10, 1, 3, # MOVE R1 to R3
-]
-
-# Create the VM instance
-vm = CustomVM(initial_memory)
-vm.execute()
-
-# Output the result
-logging.debug(f"Final register state: {vm.registers}")
-logging.debug(f"Final memory state: {vm.memory}")
