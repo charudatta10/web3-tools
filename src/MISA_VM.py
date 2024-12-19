@@ -2,7 +2,7 @@ class CustomVM:
     def __init__(self, memory):
         self.memory = memory  # Initial memory setup
         self.pc = 0  # Program counter
-        self.registers = [0] * 10  # 10 general-purpose registers
+        self.registers = [10] * 10  # 10 general-purpose registers
         self.stack = []
         self.instructions = {
             0: self.add,
