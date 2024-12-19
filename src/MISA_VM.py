@@ -127,6 +127,13 @@ class CustomVM:
         self.registers[a] = self.memory[address]
         self.pc += 2
 
+    def load(self):
+        a = self.memory[self.pc]
+        address = self.memory[self.pc + 1]
+        self.validate_register_index(a)
+        self.registers[a] = self.memory[address]
+        self.pc += 2
+
     def store(self):
         a = self.memory[self.pc]
         address = self.memory[self.pc + 1]
@@ -209,7 +216,7 @@ for i in range(len(initial_memory)):
     if i % 3 != 0:  # Skip opcodes
         if initial_memory[i] >= 8:  # Assuming 8 registers
             initial_memory[i] = 7  # Set to the highest valid index
-            
+
 # Create the VM instance
 vm = CustomVM(initial_memory)
 vm.execute()
