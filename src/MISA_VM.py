@@ -52,6 +52,8 @@ class CustomVM:
             raise IndexError(f"Register index {index} out of range.")
 
     def add(self):
+        if self.pc + 1 >= len(self.memory):
+            raise IndexError("Memory access out of bounds")
         a = self.memory[self.pc]
         b = self.memory[self.pc + 1]
         self.validate_register_index(a)
@@ -115,8 +117,10 @@ class CustomVM:
         self.validate_register_index(a)
         self.registers[a] = ~self.registers[a]
         self.pc += 1
-
-    def load(self):
+        if self.pc + 1 >= len(self.memory):
+            raise IndexError("Memory access out of bounds")
+        a = self.memory[self.pc]
+        address = self.memory[self.pc + 1]
         a = self.memory[self.pc]
         address = self.memory[self.pc + 1]
         self.validate_register_index(a)
@@ -200,6 +204,12 @@ initial_memory = [
     10, 1, 3, # MOVE R1 to R3
 ]
 
+# Ensure that the register indices are within the valid range
+for i in range(len(initial_memory)):
+    if i % 3 != 0:  # Skip opcodes
+        if initial_memory[i] >= 8:  # Assuming 8 registers
+            initial_memory[i] = 7  # Set to the highest valid index
+            
 # Create the VM instance
 vm = CustomVM(initial_memory)
 vm.execute()
