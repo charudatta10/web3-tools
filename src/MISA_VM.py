@@ -62,9 +62,9 @@ class CustomVM:
     def sub(self):
         a = self.memory[self.pc]
         b = self.memory[self.pc + 1]
-        self.validate_register_index(a)
-        self.validate_register_index(b)
-        self.registers[a] -= self.registers[b]
+        if self.validate_register_index(a):
+            if self.validate_register_index(b):
+                self.registers[a] -= self.registers[b]
         self.pc += 2
 
     def mul(self):
