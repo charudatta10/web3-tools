@@ -62,10 +62,13 @@ class CustomVM:
         self.pc += 2
 
     def div(self):
-        a = self.memory[self.pc]
-        b = self.memory[self.pc + 1]
-        self.registers[a] //= self.registers[b]
-        self.pc += 2
+       a = self.memory[self.pc]
+       b = self.memory[self.pc + 1]
+       if self.registers[b] == 0:
+           raise ZeroDivisionError(f"Division by zero error: register[{b}] is zero.")
+       self.registers[a] //= self.registers[b]
+       self.pc += 2
+
 
     def and_op(self):
         a = self.memory[self.pc]
