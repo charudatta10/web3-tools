@@ -25,11 +25,15 @@ def main():
     # Print the compiled program for debugging
     print(compiled_program)
 
-    memory = [1] * 1024  # Ensure the memory is large enough
+    memory = [0] * 1024  # Ensure the memory is large enough
     memory[:len(compiled_program)] = compiled_program
 
     vm = VM(memory)
-    
+
+    # Initialize registers with values from 1 to 10
+    for i in range(10):
+        vm.registers[i] = i + 1
+    print(vm.registers)
     try:
         vm.execute()
     except Exception as e:
