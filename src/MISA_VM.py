@@ -31,10 +31,15 @@ class CustomVM:
             19: self.block_info,
         }
 
+
     def fetch_instruction(self):
-        op_code = self.memory[self.pc]
-        self.pc += 1
-        return op_code
+        if self.pc < len(self.memory):
+            op_code = self.memory[self.pc]
+            self.pc += 1
+            return op_code
+        else:
+            raise IndexError("Program counter out of bounds.")
+
 
     def load_program(self, program):
         self.memory.extend(program)

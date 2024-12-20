@@ -1,11 +1,10 @@
 import logging
-from compiler import Compiler, Parser, Lexer  # Ensure your compiler-related classes are in compiler.py
-from MISA_VM import CustomVM  # Ensure your VM-related classes are in vm.py
+from compiler import Compiler, Parser, Lexer
+from vm import VM
 
 logging.basicConfig(level=logging.DEBUG)
 
 def main():
-    # Define your high-level source code
     source_code = """
     ADD R1, R2
     SUB R1, R2
@@ -13,7 +12,6 @@ def main():
     DIV R1, R2
     """
 
-    # Compile the source code
     lexer = Lexer()
     parser = Parser(lexer)
     parser.parse(source_code)
@@ -21,15 +19,20 @@ def main():
 
     compiler = Compiler()
     compiled_program = compiler.compile(instructions)
+    
+    # Print the compiled program for debugging
+    print(compiled_program)
 
-    # Initialize the VM with the compiled program
-    memory = [0] * 1024  # Create a memory space large enough to hold the program
+    memory = [0] * 1024  # Ensure the memory is large enough
     memory[:len(compiled_program)] = compiled_program
 
     vm = VM(memory)
-    vm.execute()
+    
+    try:
+        vm.execute()
+    except Exception as e:
+        logging.error(f"Execution failed: {e}")
 
-    # Output the result
     logging.debug(f"Final register state: {vm.registers}")
     logging.debug(f"Final memory state: {vm.memory}")
 
