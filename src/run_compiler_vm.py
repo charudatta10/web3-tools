@@ -9,7 +9,9 @@ def main():
     ADD R1, R2
     SUB R1, R2
     MUL R1, R2
-    DIV R1, R2
+    ADD R1, R2
+    SUB R1, R2
+    MUL R1, R2
     """
 
     lexer = Lexer()
