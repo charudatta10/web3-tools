@@ -84,18 +84,19 @@ class Compiler:
             compiled_program.extend(self.compile_instruction(instruction))
         return compiled_program
 
-source_code = """
-ADD R1, R2
-SUB R1, R2
-MUL R1, R2
-DIV R1, R2
-"""
+if __name__ == "__main__":
+    source_code = """
+    ADD R1, R2
+    SUB R1, R2
+    MUL R1, R2
+    DIV R1, R2
+    """
 
-lexer = Lexer()
-parser = Parser(lexer)
-parser.parse(source_code)
-instructions = parser.get_instructions()
+    lexer = Lexer()
+    parser = Parser(lexer)
+    parser.parse(source_code)
+    instructions = parser.get_instructions()
 
-compiler = Compiler()
-compiled_program = compiler.compile(instructions)
-print(compiled_program)
+    compiler = Compiler()
+    compiled_program = compiler.compile(instructions)
+    print(compiled_program)
