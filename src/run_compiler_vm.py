@@ -1,6 +1,6 @@
 import logging
 from compiler import Compiler, Parser, Lexer
-from vm import VM
+from MISA_VM import CustomVM as VM
 
 logging.basicConfig(level=logging.DEBUG)
 
