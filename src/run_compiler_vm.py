@@ -25,7 +25,7 @@ def main():
     # Print the compiled program for debugging
     print(compiled_program)
 
-    memory = [0] * 1024  # Ensure the memory is large enough
+    memory = [1] * 1024  # Ensure the memory is large enough
     memory[:len(compiled_program)] = compiled_program
 
     vm = VM(memory)
