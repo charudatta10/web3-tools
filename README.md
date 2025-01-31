@@ -32,7 +32,7 @@ collection of web3 technoligies and tools
 
 ## Getting Started 🌱
 
-Run `just` cmd in command prompt.
+Run `invoke default` cmd in command prompt.
 
 ✨[Report a 🐛 or Request a ⭐](https://github.com/charudatta10/web3-tools/issues)✨
 
